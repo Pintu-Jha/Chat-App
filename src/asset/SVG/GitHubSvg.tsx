@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Svg, {SvgProps, Path} from 'react-native-svg';
 
-const GitHubSvg = ({width = 40, height = 40, ...props}: SvgProps) => (
+const GitHubSvg = ({width = 30, height = 30, ...props}: SvgProps) => (
   <Svg width={width} height={height} viewBox="0 0 20 20" {...props}>
     <Path
       fill="#000"

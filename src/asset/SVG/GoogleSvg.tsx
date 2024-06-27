@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Svg, {SvgProps, G, Path} from 'react-native-svg';
 
-const GoogleSvg = ({width = 40, height = 40, ...props}: SvgProps) => (
+const GoogleSvg = ({width = 30, height = 30, ...props}: SvgProps) => (
   <Svg width={width} height={height} viewBox="-0.5 0 48 48" {...props}>
     <G fill="none" fillRule="evenodd">
       <Path

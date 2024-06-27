@@ -5,6 +5,7 @@ import {
   Text,
   TextStyle,
   TouchableOpacity,
+  View,
   ViewStyle,
 } from 'react-native';
 import React from 'react';
@@ -16,33 +17,33 @@ type TextInputContainerProps = {
   onPress?: () => void;
   text?: string;
   style?: ViewStyle;
-  leftImg?: boolean;
+  isleftImg?: boolean;
   IconStyle?: {};
   source?: {};
   rightImg?: boolean;
   textStyle?: TextStyle;
   isLoading?: boolean;
+  leftSvg?: any;
 };
 
 const BottonComp: React.FC<TextInputContainerProps> = ({
   onPress,
   text = '',
   style = {},
-  leftImg = false,
+  isleftImg = false,
   IconStyle,
   source = {},
   rightImg = false,
   textStyle = {},
   isLoading = false,
+  leftSvg,
 }) => {
   return (
     <TouchableOpacity
       style={{...styles.container, ...style}}
       onPress={onPress}
       activeOpacity={0.8}>
-      {!!leftImg ? (
-        <Image source={source} style={{...styles.IconStyle, ...IconStyle}} />
-      ) : null}
+      {!!isleftImg ? <View>{leftSvg}</View> : null}
       {isLoading ? (
         <ActivityIndicator size={'small'} color={'white'} />
       ) : (
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     borderColor: '#C8C1DF',
     height: spacing.HEIGHT_50,
     flexDirection: 'row',
-    marginBottom:spacing.MARGIN_8
+    marginBottom: spacing.MARGIN_8,
   },
   textStyle: {
     color: '#0F0C1A',

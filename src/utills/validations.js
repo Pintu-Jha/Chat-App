@@ -17,9 +17,40 @@ const checkMinLength = (val, minLength, key) => {
     }
 }
 
- export default function (data){
-        const {email,password} = data
-     
+export default function (data) {
+    const { 
+        fullName,
+        username,
+        email, 
+        password,
+        otp
+     } = data;
+
+     if (username !== undefined) {
+        let emptyValidationText = checkEmpty(username, "User name");
+        if (emptyValidationText !== '') {
+            return emptyValidationText
+        }else{
+            let minLenghtValidation = checkMinLength(username, 3, "User name");
+            if(minLenghtValidation !== ''){
+                return minLenghtValidation;
+            }
+        }
+    }
+
+    if (fullName !== undefined) {
+        let emptyValidationText = checkEmpty(fullName, "Full name");
+        if (emptyValidationText !== '') {
+            return emptyValidationText
+        }else{
+            let minLenghtValidation = checkMinLength(fullName, 3, "Full name");
+            if(minLenghtValidation !== ''){
+                return minLenghtValidation;
+            }
+        }
+    }
+
+
     if (email !== undefined) {
         let emptyValidationText = checkEmpty(email, "email");
         if (emptyValidationText !== '') {
@@ -42,4 +73,17 @@ const checkMinLength = (val, minLength, key) => {
             }
         }
     }
+
+    if (otp !== undefined) {
+        let emptyValidationText = checkEmpty(otp, "Otp");
+        if (emptyValidationText !== '') {
+            return emptyValidationText
+        }else{
+            let minLenghtValidation = checkMinLength(otp, 4, "Otp");
+            if(minLenghtValidation !== ''){
+                return minLenghtValidation;
+            }
+        }
+    }
+
 }

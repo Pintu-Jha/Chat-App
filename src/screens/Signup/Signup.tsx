@@ -15,17 +15,22 @@ import EyeSvg from '../../asset/SVG/EyeSvg';
 import UserSvg from '../../asset/SVG/UserSvg';
 import EmailSvg from '../../asset/SVG/EmailSvg';
 import PasswordSvg from '../../asset/SVG/PasswordSvg';
+import GoogleSvg from '../../asset/SVG/GoogleSvg';
+import GitHubSvg from '../../asset/SVG/GitHubSvg';
+import {useDispatch} from 'react-redux';
+import {useSignupMutation} from '../../API/endpoints/authApi';
+import validator from '../../utills/validations';
+import {showError} from '../../utills/HelperFuncation';
+import { setUser } from '../../redux/slices/authSlice';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'signupScreen'>;
 
 const Signup: React.FC<Props> = ({navigation}) => {
-  const [userName, setUserName] = useState<string>('');
+  const [username, setUserName] = useState<string>('');
   const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
-  const [isLoding, setIsLoding] = useState<boolean>(false);
 
   //   const isValidData= () =>{
   //     const error = validator({
@@ -69,15 +74,52 @@ const Signup: React.FC<Props> = ({navigation}) => {
 
   // }
 
+  const [Signup, {isLoading, isError}] = useSignupMutation();
+  const dispatch = useDispatch();
+
+  const isValidData = () => {
+    const error = validator({
+      email,
+      username,
+      password,
+    });
+    if (error) {
+      showError(error);
+      return false;
+    }
+    return true;
+  };
+  const handleSignup = async () => {
+    const validations = isValidData();
+    if (validations) {
+      try {
+        const response = await Signup({email, username, password}).unwrap();
+        console.log('response>>', response);
+        dispatch(
+          setUser({
+            user: response.data.user,
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            message: response.message,
+            success: response.success,
+          }),
+        );
+      } catch (err) {
+        console.error(err);
+        console.log(isError);
+      }
+    }
+  };
   return (
     <WapperContainer>
       <KeyboardAwareScrollView>
-        <View style={{padding: spacing.PADDING_16}}>
+        <View
+          style={{padding: spacing.PADDING_16, height: spacing.FULL_HEIGHT}}>
           <TextComp text={'Join us for free'} style={styles.headerStyle} />
-          <View style={{marginTop: spacing.MARGIN_84}}>
+          <View style={{flexGrow: 0.9}}>
             <TextInputComp
-              value={userName}
-              placeholder={'UserName'}
+              value={username}
+              placeholder={'User Name'}
               onChangeText={value => setUserName(value)}
               isTitleIcon={true}
               titleIcon={<UserSvg />}
@@ -106,24 +148,55 @@ const Signup: React.FC<Props> = ({navigation}) => {
               isTitleIcon={true}
               titleIcon={<PasswordSvg />}
             />
-            <TextInputComp
-              value={confirmPassword}
-              placeholder={'Confirm Password'}
-              onChangeText={value => setConfirmPassword(value)}
-              secureTextEntry={secureText}
-              secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
-              onPressSecure={() => setSecureText(!secureText)}
-              isTitleIcon={true}
-              titleIcon={<PasswordSvg />}
-            />
           </View>
-          <BottonComp
-            text={'Sign Up'}
-            style={{marginTop: spacing.MARGIN_30, backgroundColor: '#0B0Eff'}}
-            onPress={() => navigation.navigate(navigationString.LOGIN_SCREEN)}
-            isLoading={isLoding}
-            textStyle={{fontSize: textScale(18), color: '#fff'}}
-          />
+          <View style={{}}>
+            <BottonComp
+              text={'Sign Up'}
+              onPress={() => {}}
+              isLoading={false}
+              style={{backgroundColor: '#0B0Eff'}}
+              textStyle={{fontSize: textScale(18), color: '#fff'}}
+            />
+            <BottonComp
+              text={'Sign up with Google'}
+              isleftImg={true}
+              leftSvg={<GoogleSvg />}
+              onPress={() => {}}
+              // isLoading={isLoading}
+              textStyle={{
+                fontSize: textScale(18),
+                color: '#000',
+                marginLeft: spacing.MARGIN_6,
+              }}
+            />
+            <BottonComp
+              text={'Sign up with GitHub'}
+              isleftImg={true}
+              leftSvg={<GitHubSvg />}
+              onPress={() => {}}
+              // isLoading={isLoading}
+              textStyle={{
+                fontSize: textScale(18),
+                color: '#000',
+                marginLeft: spacing.MARGIN_6,
+              }}
+            />
+            <TextComp
+              text={`Already have a account?`}
+              style={{
+                alignSelf: 'center',
+                fontSize: textScale(14),
+                color: '#5a5a5a',
+              }}>
+              <Text
+                style={{color: '#1c20c8'}}
+                onPress={() =>
+                  navigation.navigate(navigationString.LOGIN_SCREEN)
+                }>
+                Login
+              </Text>
+            </TextComp>
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </WapperContainer>
@@ -137,11 +210,15 @@ const styles = StyleSheet.create({
     fontSize: textScale(26),
     color: '#0B0Eff',
     fontWeight: 'bold',
+    marginBottom: spacing.MARGIN_16,
   },
   descStyle: {
     fontSize: textScale(14),
     // fontFamily: fontFamily.regular,
     marginTop: spacing.MARGIN_12,
     marginBottom: spacing.MARGIN_50,
+  },
+  loginBtnContainer: {
+    padding: spacing.PADDING_16,
   },
 });

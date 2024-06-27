@@ -6,8 +6,9 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {spacing} from '../../styles/spacing';
 // import validator from '../../Utills/validations';
 // import {showError} from '../../utills/HelperFuncation';
@@ -22,71 +23,74 @@ import GoogleSvg from '../../asset/SVG/GoogleSvg';
 import GitHubSvg from '../../asset/SVG/GitHubSvg';
 import EyeSvg from '../../asset/SVG/EyeSvg';
 import HideEyeSvg from '../../asset/SVG/HideEyeSvg';
-import EmailSvg from '../../asset/SVG/EmailSvg';
 import PasswordSvg from '../../asset/SVG/PasswordSvg';
+import {useLoginMutation} from '../../API/endpoints/authApi';
+import {useDispatch} from 'react-redux';
+import {setUser} from '../../redux/slices/authSlice';
+import UserSvg from '../../asset/SVG/UserSvg';
+import {showError} from '../../utills/HelperFuncation';
+import validator from '../../utills/validations';
 import navigationString from '../../navigation/navigationString';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'loginScreen'>;
 
 const Login: FC<Props> = ({navigation}) => {
-  const [email, setEmail] = useState<string>('');
+  const [username, setuserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
-  const [isLoading, setLoading] = useState<boolean>(false);
 
-  // const isValidData = () => {
-  //   const error = validator({
-  //     email,
-  //     password,
-  //   });
-  //   if (error) {
-  //     showError(error);
-  //     return false;
-  //   }
-  //   return true;
-  // };
-  // const onLogin = async () => {
-  //   const checkValid = isValidData();
-  //   if (checkValid) {
-  //     setLoading(true);
-  //     try {
-  //       // let fcmToken = await AsyncStorage.getItem('fcm_token');
+  const [login, {isLoading, isError}] = useLoginMutation();
+  const dispatch = useDispatch();
 
-  //       const res = await userLogin({
-  //         email,
-  //         password,
-  //         // fcmToken
-  //       });
-  //       // console.log('login api res', res);
-  //       setLoading(false);
-  //       // if(!!res.data && !res?.data?.validOTP){
-  //       //     navigation.navigate(navigationStrings.OTP_VERIFICATION,{data: res.data})
-  //       //     return;
-  //       // }
-  //     } catch (error) {
-  //       console.log('error in login api', error);
-  //       showError(error?.error);
-  //       setLoading(false);
-  //     }
-  //   }
-  // };
+  const isValidData = () => {
+    const error = validator({
+      username,
+      password,
+    });
+    if (error) {
+      showError(error);
+      return false;
+    }
+    return true;
+  };
+  const handleLogin = async () => {
+    const validations = isValidData();
+    if (validations) {
+      try {
+        const response = await login({password, username}).unwrap();
+        console.log('response>>', response);
+        dispatch(
+          setUser({
+            user: response.data.user,
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            message: response.message,
+            success: response.success,
+          }),
+        );
+      } catch (err) {
+        console.error(err);
+        console.log(isError);
+      }
+    }
+  };
 
   return (
     <WapperContainer>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{flex: 1, padding: spacing.PADDING_16}}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{flex: 1}}>
-            <TextComp text={'Lets Sign you in'} style={styles.headerStyle} />
-            <TextComp text={'Wellcome back.'} style={styles.descStyle} />
+      <KeyboardAwareScrollView>
+        <View
+          style={{padding: spacing.PADDING_16, height: spacing.FULL_HEIGHT}}>
+          <TextComp text={'Lets Sign you in'} style={styles.headerStyle} />
+          <TextComp text={'Wellcome back.'} style={styles.descStyle} />
+          <View style={{flexGrow: 0.92}}>
             <TextInputComp
-              value={email}
-              placeholder={'Enter Email'}
-              onChangeText={value => setEmail(value)}
-              keyboardType="email-address"
+              value={username}
+              placeholder={'Enter UserName'}
+              onChangeText={value => setuserName(value)}
+              keyboardType="default"
               isTitleIcon={true}
-              titleIcon={<EmailSvg />}
+              titleIcon={<UserSvg />}
             />
             <TextInputComp
               value={password}
@@ -104,21 +108,57 @@ const Login: FC<Props> = ({navigation}) => {
               text={'Forgot Password?'}
             />
           </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-      <View style={styles.loginBtnContainer}>
-        <BottonComp
-          text={'Login'}
-          onPress={() => navigation.navigate(navigationString.SIGNUP_SCREEN)}
-          isLoading={isLoading}
-          style={{backgroundColor: '#0B0Eff'}}
-          textStyle={{fontSize: textScale(18), color: '#fff'}}
-        />
-      </View>
-      <View style={styles.loggingWithSocialMedia}>
-        <GoogleSvg style={{marginRight: spacing.MARGIN_12}} />
-        <GitHubSvg />
-      </View>
+
+          <View style={styles.loginBtnContainer}>
+            <BottonComp
+              text={'Login'}
+              onPress={handleLogin}
+              isLoading={isLoading}
+              style={{backgroundColor: '#0B0Eff'}}
+              textStyle={{fontSize: textScale(18), color: '#fff'}}
+            />
+            <BottonComp
+              text={'Sign in with Google'}
+              isleftImg={true}
+              leftSvg={<GoogleSvg />}
+              onPress={() => {}}
+              // isLoading={isLoading}
+              textStyle={{
+                fontSize: textScale(18),
+                color: '#000',
+                marginLeft: spacing.MARGIN_6,
+              }}
+            />
+            <BottonComp
+              text={'Sign in with GitHub'}
+              isleftImg={true}
+              leftSvg={<GitHubSvg />}
+              onPress={() => {}}
+              // isLoading={isLoading}
+              textStyle={{
+                fontSize: textScale(18),
+                color: '#000',
+                marginLeft: spacing.MARGIN_6,
+              }}
+            />
+            <TextComp
+              text={`Don't have a account?`}
+              style={{
+                alignSelf: 'center',
+                fontSize: textScale(14),
+                color: '#5a5a5a',
+              }}>
+              <Text
+                style={{color: '#1c20c8'}}
+                onPress={() =>
+                  navigation.navigate(navigationString.SIGNUP_SCREEN)
+                }>
+                Sign up
+              </Text>
+            </TextComp>
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
     </WapperContainer>
   );
 };
@@ -127,15 +167,15 @@ export default Login;
 
 const styles = StyleSheet.create({
   headerStyle: {
-    fontSize: textScale(30),
+    fontSize: textScale(26),
     color: '#0B0Eff',
     fontWeight: 'bold',
+    marginTop: spacing.MARGIN_16,
   },
   descStyle: {
     fontSize: textScale(24),
-    marginTop: spacing.MARGIN_12,
-    marginBottom: spacing.MARGIN_40,
     fontWeight: '500',
+    marginBottom: spacing.MARGIN_16,
   },
   forgotTextStyle: {
     fontSize: textScale(14),
@@ -143,12 +183,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     color: 'blue',
   },
-  loginBtnContainer: {
-    padding: spacing.PADDING_16,
-  },
+  loginBtnContainer: {},
   loggingWithSocialMedia: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingBottom: spacing.PADDING_16,
   },
 });

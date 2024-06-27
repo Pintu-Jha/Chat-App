@@ -262,6 +262,8 @@ export const spacing = {
   MARGIN_90: moderateScale(90),
   MARGIN_100: moderateScale(100),
   MARGIN_112: moderateScale(112),
+  MARGIN_150: moderateScale(150),
+  MARGIN_200: moderateScale(200),
   MARGIN_320: moderateScale(320),
   MARGIN_400: moderateScale(400),
   MARGIN_420: moderateScale(420),
