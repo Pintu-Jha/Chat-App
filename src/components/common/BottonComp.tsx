@@ -24,6 +24,7 @@ type TextInputContainerProps = {
   textStyle?: TextStyle;
   isLoading?: boolean;
   leftSvg?: any;
+  ActivityIndicatorColor?:string
 };
 
 const BottonComp: React.FC<TextInputContainerProps> = ({
@@ -36,24 +37,21 @@ const BottonComp: React.FC<TextInputContainerProps> = ({
   rightImg = false,
   textStyle = {},
   isLoading = false,
-  leftSvg,
+  leftSvg = null,
+  ActivityIndicatorColor='white'
 }) => {
   return (
     <TouchableOpacity
       style={{...styles.container, ...style}}
       onPress={onPress}
       activeOpacity={0.8}>
-      {!!isleftImg ? <View>{leftSvg}</View> : null}
       {isLoading ? (
-        <ActivityIndicator size={'small'} color={'white'} />
+        <ActivityIndicator size={'small'} color={ActivityIndicatorColor} />
       ) : (
-        <Text
-          style={{
-            ...styles.textStyle,
-            ...textStyle,
-          }}>
-          {text}
-        </Text>
+        <View style={styles.content}>
+          {isleftImg && <View>{leftSvg}</View>}
+          <Text style={{...styles.textStyle, ...textStyle}}>{text}</Text>
+        </View>
       )}
       {!!rightImg ? (
         <Image source={source} style={{...styles.IconStyle, ...IconStyle}} />
@@ -85,5 +83,9 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     width: spacing.WIDTH_18,
     height: spacing.HEIGHT_18,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

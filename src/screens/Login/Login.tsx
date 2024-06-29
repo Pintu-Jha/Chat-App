@@ -1,17 +1,14 @@
 import {
-  StyleSheet,
-  Text,
-  View,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
+  StyleSheet,
+  Text,
   TouchableWithoutFeedback,
-  Alert,
+  View,
 } from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useState} from 'react';
 import {spacing} from '../../styles/spacing';
-// import validator from '../../Utills/validations';
-// import {showError} from '../../utills/HelperFuncation';
 import WapperContainer from '../../components/common/WapperContainer';
 import TextComp from '../../components/common/TextComp';
 import {textScale} from '../../styles/responsiveStyles';
@@ -20,7 +17,6 @@ import BottonComp from '../../components/common/BottonComp';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AuthStackParams} from '../../navigation/AuthStack';
 import GoogleSvg from '../../asset/SVG/GoogleSvg';
-import GitHubSvg from '../../asset/SVG/GitHubSvg';
 import EyeSvg from '../../asset/SVG/EyeSvg';
 import HideEyeSvg from '../../asset/SVG/HideEyeSvg';
 import PasswordSvg from '../../asset/SVG/PasswordSvg';
@@ -32,13 +28,23 @@ import {showError} from '../../utills/HelperFuncation';
 import validator from '../../utills/validations';
 import navigationString from '../../navigation/navigationString';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'loginScreen'>;
+GoogleSignin.configure({
+  webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
+  offlineAccess: true,
+});
 
 const Login: FC<Props> = ({navigation}) => {
   const [username, setuserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
+  const [isGoogleLoading, setIsGoogleLoding] = useState<boolean>(false);
 
   const [login, {isLoading, isError}] = useLoginMutation();
   const dispatch = useDispatch();
@@ -66,99 +72,131 @@ const Login: FC<Props> = ({navigation}) => {
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
             message: response.message,
-            success: response.success,
           }),
         );
       } catch (err) {
         console.error(err);
-        console.log(isError);
+        console.log('isError>>', isError);
       }
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setIsGoogleLoding(true);
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const data = {
+        email: userInfo.user.email,
+        name: userInfo.user.name,
+        photo: userInfo.user.photo,
+      };
+      dispatch(
+        setUser({
+          user: data,
+          accessToken: userInfo.idToken,
+          refreshToken: '',
+          message: '',
+        }),
+        setIsGoogleLoding(false),
+      );
+    } catch (error) {
+      setIsGoogleLoding(false);
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.SIGN_IN_CANCELLED:
+            break;
+          case statusCodes.IN_PROGRESS:
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            break;
+          default:
+        }
+        console.log(error);
+      }
+    }
+  };
   return (
     <WapperContainer>
-      <KeyboardAwareScrollView>
-        <View
-          style={{padding: spacing.PADDING_16, height: spacing.FULL_HEIGHT}}>
-          <TextComp text={'Lets Sign you in'} style={styles.headerStyle} />
-          <TextComp text={'Wellcome back.'} style={styles.descStyle} />
-          <View style={{flexGrow: 0.92}}>
-            <TextInputComp
-              value={username}
-              placeholder={'Enter UserName'}
-              onChangeText={value => setuserName(value)}
-              keyboardType="default"
-              isTitleIcon={true}
-              titleIcon={<UserSvg />}
-            />
-            <TextInputComp
-              value={password}
-              placeholder={'Enter Password'}
-              onChangeText={value => setPassword(value)}
-              secureTextEntry={secureText}
-              secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
-              onPressSecure={() => setSecureText(!secureText)}
-              keyboardType="default"
-              isTitleIcon={true}
-              titleIcon={<PasswordSvg />}
-            />
-            <TextComp
-              style={styles.forgotTextStyle}
-              text={'Forgot Password?'}
-            />
-          </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View
+            style={{
+              padding: spacing.PADDING_16,
+              flex: 1,
+              justifyContent: 'space-between',
+            }}>
+            <View>
+              <TextComp text={'Lets Sign you in'} style={styles.headerStyle} />
+              <TextComp text={'Wellcome back.'} style={styles.descStyle} />
+              <TextInputComp
+                value={username}
+                placeholder={'Enter UserName'}
+                onChangeText={value => setuserName(value)}
+                keyboardType="default"
+                isTitleIcon={true}
+                titleIcon={<UserSvg />}
+              />
+              <TextInputComp
+                value={password}
+                placeholder={'Enter Password'}
+                onChangeText={value => setPassword(value)}
+                secureTextEntry={secureText}
+                secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
+                onPressSecure={() => setSecureText(!secureText)}
+                keyboardType="default"
+                isTitleIcon={true}
+                titleIcon={<PasswordSvg />}
+              />
+              <TextComp
+                style={styles.forgotTextStyle}
+                text={'Forgot Password?'}
+              />
+            </View>
 
-          <View style={styles.loginBtnContainer}>
-            <BottonComp
-              text={'Login'}
-              onPress={handleLogin}
-              isLoading={isLoading}
-              style={{backgroundColor: '#0B0Eff'}}
-              textStyle={{fontSize: textScale(18), color: '#fff'}}
-            />
-            <BottonComp
-              text={'Sign in with Google'}
-              isleftImg={true}
-              leftSvg={<GoogleSvg />}
-              onPress={() => {}}
-              // isLoading={isLoading}
-              textStyle={{
-                fontSize: textScale(18),
-                color: '#000',
-                marginLeft: spacing.MARGIN_6,
-              }}
-            />
-            <BottonComp
-              text={'Sign in with GitHub'}
-              isleftImg={true}
-              leftSvg={<GitHubSvg />}
-              onPress={() => {}}
-              // isLoading={isLoading}
-              textStyle={{
-                fontSize: textScale(18),
-                color: '#000',
-                marginLeft: spacing.MARGIN_6,
-              }}
-            />
-            <TextComp
-              text={`Don't have a account?`}
-              style={{
-                alignSelf: 'center',
-                fontSize: textScale(14),
-                color: '#5a5a5a',
-              }}>
-              <Text
-                style={{color: '#1c20c8'}}
-                onPress={() =>
-                  navigation.navigate(navigationString.SIGNUP_SCREEN)
-                }>
-                Sign up
-              </Text>
-            </TextComp>
+            <View style={styles.loggingWithSocialMedia}>
+              <BottonComp
+                text={'Login'}
+                onPress={handleLogin}
+                isLoading={isLoading}
+                style={{backgroundColor: '#0B0Eff'}}
+                textStyle={{fontSize: textScale(18), color: '#fff'}}
+              />
+              <BottonComp
+                text={'Sign in with Google'}
+                isleftImg={true}
+                leftSvg={<GoogleSvg />}
+                onPress={handleGoogleLogin}
+                isLoading={isGoogleLoading}
+                textStyle={{
+                  fontSize: textScale(18),
+                  color: '#000',
+                  marginLeft: spacing.MARGIN_6,
+                }}
+                ActivityIndicatorColor={'#0B0Eff'}
+              />
+              <TextComp
+                text={`Don't have a account?`}
+                style={{
+                  alignSelf: 'center',
+                  fontSize: textScale(14),
+                  color: '#5a5a5a',
+                  margintop: spacing.MARGIN_10,
+                }}>
+                <Text
+                  style={{color: '#1c20c8'}}
+                  onPress={() =>
+                    navigation.navigate(navigationString.SIGNUP_SCREEN)
+                  }>
+                  Sign up
+                </Text>
+              </TextComp>
+            </View>
           </View>
-        </View>
-      </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </WapperContainer>
   );
 };
@@ -183,9 +221,5 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     color: 'blue',
   },
-  loginBtnContainer: {},
-  loggingWithSocialMedia: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
+  loggingWithSocialMedia: {},
 });

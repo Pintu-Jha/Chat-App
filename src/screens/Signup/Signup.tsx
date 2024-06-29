@@ -1,4 +1,12 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import React, {useState} from 'react';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import WapperContainer from '../../components/common/WapperContainer';
@@ -21,7 +29,7 @@ import {useDispatch} from 'react-redux';
 import {useSignupMutation} from '../../API/endpoints/authApi';
 import validator from '../../utills/validations';
 import {showError} from '../../utills/HelperFuncation';
-import { setUser } from '../../redux/slices/authSlice';
+import {setUser} from '../../redux/slices/authSlice';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'signupScreen'>;
 
@@ -101,7 +109,6 @@ const Signup: React.FC<Props> = ({navigation}) => {
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
             message: response.message,
-            success: response.success,
           }),
         );
       } catch (err) {
@@ -112,93 +119,83 @@ const Signup: React.FC<Props> = ({navigation}) => {
   };
   return (
     <WapperContainer>
-      <KeyboardAwareScrollView>
-        <View
-          style={{padding: spacing.PADDING_16, height: spacing.FULL_HEIGHT}}>
-          <TextComp text={'Join us for free'} style={styles.headerStyle} />
-          <View style={{flexGrow: 0.9}}>
-            <TextInputComp
-              value={username}
-              placeholder={'User Name'}
-              onChangeText={value => setUserName(value)}
-              isTitleIcon={true}
-              titleIcon={<UserSvg />}
-            />
-            <TextInputComp
-              value={fullName}
-              placeholder={'Full Name'}
-              onChangeText={value => setFullName(value)}
-              isTitleIcon={true}
-              titleIcon={<UserSvg />}
-            />
-            <TextInputComp
-              value={email}
-              placeholder={'Email'}
-              onChangeText={value => setEmail(value)}
-              isTitleIcon={true}
-              titleIcon={<EmailSvg />}
-            />
-            <TextInputComp
-              value={password}
-              placeholder={'Password'}
-              onChangeText={value => setPassword(value)}
-              secureTextEntry={secureText}
-              secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
-              onPressSecure={() => setSecureText(!secureText)}
-              isTitleIcon={true}
-              titleIcon={<PasswordSvg />}
-            />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View
+            style={{
+              padding: spacing.PADDING_16,
+              flex: 1,
+              justifyContent: 'space-between',
+            }}>
+            <View>
+              <TextComp text={'Join us for free'} style={styles.headerStyle} />
+              <TextInputComp
+                value={username}
+                placeholder={'User Name'}
+                onChangeText={value => setUserName(value)}
+                isTitleIcon={true}
+                titleIcon={<UserSvg />}
+              />
+              <TextInputComp
+                value={email}
+                placeholder={'Email'}
+                onChangeText={value => setEmail(value)}
+                isTitleIcon={true}
+                titleIcon={<EmailSvg />}
+              />
+              <TextInputComp
+                value={password}
+                placeholder={'Password'}
+                onChangeText={value => setPassword(value)}
+                secureTextEntry={secureText}
+                secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
+                onPressSecure={() => setSecureText(!secureText)}
+                isTitleIcon={true}
+                titleIcon={<PasswordSvg />}
+              />
+            </View>
+            <View>
+              <BottonComp
+                text={'Sign Up'}
+                onPress={() => {}}
+                isLoading={false}
+                style={{backgroundColor: '#0B0Eff'}}
+                textStyle={{fontSize: textScale(18), color: '#fff'}}
+              />
+              <BottonComp
+                text={'Sign up with Google'}
+                isleftImg={true}
+                leftSvg={<GoogleSvg />}
+                onPress={() => {}}
+                // isLoading={isLoading}
+                textStyle={{
+                  fontSize: textScale(18),
+                  color: '#000',
+                  marginLeft: spacing.MARGIN_6,
+                }}
+              />
+              <TextComp
+                text={`Already have a account?`}
+                style={{
+                  alignSelf: 'center',
+                  fontSize: textScale(14),
+                  color: '#5a5a5a',
+                  margintop: spacing.MARGIN_10,
+                }}>
+                <Text
+                  style={{color: '#1c20c8'}}
+                  onPress={() =>
+                    navigation.navigate(navigationString.LOGIN_SCREEN)
+                  }>
+                  Login
+                </Text>
+              </TextComp>
+            </View>
           </View>
-          <View style={{}}>
-            <BottonComp
-              text={'Sign Up'}
-              onPress={() => {}}
-              isLoading={false}
-              style={{backgroundColor: '#0B0Eff'}}
-              textStyle={{fontSize: textScale(18), color: '#fff'}}
-            />
-            <BottonComp
-              text={'Sign up with Google'}
-              isleftImg={true}
-              leftSvg={<GoogleSvg />}
-              onPress={() => {}}
-              // isLoading={isLoading}
-              textStyle={{
-                fontSize: textScale(18),
-                color: '#000',
-                marginLeft: spacing.MARGIN_6,
-              }}
-            />
-            <BottonComp
-              text={'Sign up with GitHub'}
-              isleftImg={true}
-              leftSvg={<GitHubSvg />}
-              onPress={() => {}}
-              // isLoading={isLoading}
-              textStyle={{
-                fontSize: textScale(18),
-                color: '#000',
-                marginLeft: spacing.MARGIN_6,
-              }}
-            />
-            <TextComp
-              text={`Already have a account?`}
-              style={{
-                alignSelf: 'center',
-                fontSize: textScale(14),
-                color: '#5a5a5a',
-              }}>
-              <Text
-                style={{color: '#1c20c8'}}
-                onPress={() =>
-                  navigation.navigate(navigationString.LOGIN_SCREEN)
-                }>
-                Login
-              </Text>
-            </TextComp>
-          </View>
-        </View>
-      </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </WapperContainer>
   );
 };

@@ -1,4 +1,4 @@
-import {LOGIN, SIGN_UP} from '../../config/url';
+import {LOGIN, LOGIN_WITH_GOOGLE, SIGN_UP} from '../../config/url';
 import {baseApi} from '../apiSlice';
 
 interface LoginRequest {
@@ -29,9 +29,10 @@ interface User {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  photo: any | null;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   statusCode: number;
   data: {
     user: User;
@@ -39,7 +40,6 @@ interface AuthResponse {
     refreshToken: string;
   };
   message: string;
-  success: boolean;
 }
 
 export const authApi = baseApi.injectEndpoints({
@@ -48,7 +48,7 @@ export const authApi = baseApi.injectEndpoints({
       query: credentials => ({
         url: LOGIN,
         method: 'POST',
-        body: JSON.stringify(credentials),
+        body: credentials,
       }),
     }),
     signup: builder.mutation<AuthResponse, SignupRequest>({
@@ -58,8 +58,14 @@ export const authApi = baseApi.injectEndpoints({
         body: credentials,
       }),
     }),
+    loginWithGoogle: builder.mutation<AuthResponse, {idToken: string}>({
+      query: ({idToken}) => ({
+        url: `${LOGIN_WITH_GOOGLE}?token=${idToken}`,
+      }),
+    }),
   }),
   overrideExisting: true,
 });
 
-export const {useLoginMutation, useSignupMutation} = authApi;
+export const {useLoginMutation, useSignupMutation, useLoginWithGoogleMutation} =
+  authApi;
