@@ -30,58 +30,20 @@ import {useSignupMutation} from '../../API/endpoints/authApi';
 import validator from '../../utills/validations';
 import {showError} from '../../utills/HelperFuncation';
 import {setUser} from '../../redux/slices/authSlice';
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'signupScreen'>;
 
 const Signup: React.FC<Props> = ({navigation}) => {
   const [username, setUserName] = useState<string>('');
-  const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
-
-  //   const isValidData= () =>{
-  //     const error = validator({
-  //         userName,
-  //         fullName,
-  //         email,
-  //         password
-  //     })
-  //     if(error){
-  //         showError(error)
-  //         return false
-  //     }
-  //     return true
-  // }
-
-  // const onPressSignup = async() =>{
-
-  //     const checkValid = isValidData()
-
-  //     if(checkValid){
-  //         setIsLoding(true)
-  //         // let fcmToken = await AsyncStorage.getItem('fcm_token');
-  //         let data =  {
-  //             userName:userName,
-  //             fullName:fullName,
-  //             email:email,
-  //             password:password,
-  //             // fcmToken: fcmToken
-  //         }
-  //         try {
-  //             let res =  await userSignup(data)
-  //             console.log("resO",res)
-  //             setIsLoding(false)
-  //             navigation.navigate(navigationString.OTP_VERIFICATION,{data: res.data})
-  //         } catch (error) {
-  //             console.log("error raised",error)
-  //             showError(error?.error || error?.message)
-  //             setIsLoding(false)
-  //         }
-  //     }
-
-  // }
-
+  const [isGoogleLoading, setIsGoogleLoding] = useState<boolean>(false);
   const [Signup, {isLoading, isError}] = useSignupMutation();
   const dispatch = useDispatch();
 
@@ -114,6 +76,42 @@ const Signup: React.FC<Props> = ({navigation}) => {
       } catch (err) {
         console.error(err);
         console.log(isError);
+      }
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsGoogleLoding(true);
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const data = {
+        email: userInfo.user.email,
+        name: userInfo.user.name,
+        photo: userInfo.user.photo,
+      };
+      dispatch(
+        setUser({
+          user: data,
+          accessToken: userInfo.idToken,
+          refreshToken: '',
+          message: '',
+        }),
+        setIsGoogleLoding(false),
+      );
+    } catch (error) {
+      setIsGoogleLoding(false);
+      if (isErrorWithCode(error)) {
+        switch (error.code) {
+          case statusCodes.SIGN_IN_CANCELLED:
+            break;
+          case statusCodes.IN_PROGRESS:
+            break;
+          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+            break;
+          default:
+        }
+        console.log(error);
       }
     }
   };
@@ -159,8 +157,8 @@ const Signup: React.FC<Props> = ({navigation}) => {
             <View>
               <BottonComp
                 text={'Sign Up'}
-                onPress={() => {}}
-                isLoading={false}
+                onPress={handleSignup}
+                isLoading={isLoading}
                 style={{backgroundColor: '#0B0Eff'}}
                 textStyle={{fontSize: textScale(18), color: '#fff'}}
               />
@@ -168,13 +166,14 @@ const Signup: React.FC<Props> = ({navigation}) => {
                 text={'Sign up with Google'}
                 isleftImg={true}
                 leftSvg={<GoogleSvg />}
-                onPress={() => {}}
-                // isLoading={isLoading}
+                onPress={handleGoogleSignUp}
+                isLoading={isGoogleLoading}
                 textStyle={{
                   fontSize: textScale(18),
                   color: '#000',
                   marginLeft: spacing.MARGIN_6,
                 }}
+                ActivityIndicatorColor="#0B0Eff"
               />
               <TextComp
                 text={`Already have a account?`}

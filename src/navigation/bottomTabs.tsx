@@ -21,25 +21,25 @@ const Tab = createBottomTabNavigator<BottomTabsRootStackParams>();
 
 const tabData = [
   {
-    name: navigationString.HOME_SCREEN,
+    name: navigationString.MESSAGE_SCREEN,
     label: 'Message',
     icon: ImagePath.IC_MESSAGE,
     component: Screen.ChatsScreen,
   },
   {
-    name: navigationString.COLLEGE_SCREEN,
+    name: navigationString.UPDATE_SCREEN,
     label: 'Update',
     icon: ImagePath.IC_UPDATE,
-    component: Screen.SignupScreen,
+    component: Screen.UpdatesScreen,
   },
   {
-    name: navigationString.COURSE_SCREEN,
+    name: navigationString.COMMUNITIES_SCREEN,
     label: 'Communities',
     icon: ImagePath.IC_COMMUNITES,
     component: Screen.CommunitiesScreen,
   },
   {
-    name: navigationString.EXAM_SCREEN,
+    name: navigationString.CALL_SCREEN,
     label: 'Call',
     icon: ImagePath.IC_CALL,
     component: Screen.CallsScreen,

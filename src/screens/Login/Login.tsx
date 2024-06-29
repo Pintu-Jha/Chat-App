@@ -27,7 +27,6 @@ import UserSvg from '../../asset/SVG/UserSvg';
 import {showError} from '../../utills/HelperFuncation';
 import validator from '../../utills/validations';
 import navigationString from '../../navigation/navigationString';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {
   GoogleSignin,
   isErrorWithCode,
