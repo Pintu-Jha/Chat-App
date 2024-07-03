@@ -21,7 +21,7 @@ import EyeSvg from '../../asset/SVG/EyeSvg';
 import HideEyeSvg from '../../asset/SVG/HideEyeSvg';
 import PasswordSvg from '../../asset/SVG/PasswordSvg';
 import {useLoginMutation} from '../../API/endpoints/authApi';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {setUser} from '../../redux/slices/authSlice';
 import UserSvg from '../../asset/SVG/UserSvg';
 import {showError} from '../../utills/HelperFuncation';
@@ -33,18 +33,14 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 
+
 type Props = NativeStackScreenProps<AuthStackParams, 'loginScreen'>;
-GoogleSignin.configure({
-  webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
-  offlineAccess: true,
-});
 
 const Login: FC<Props> = ({navigation}) => {
   const [username, setuserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
   const [isGoogleLoading, setIsGoogleLoding] = useState<boolean>(false);
-
   const [login, {isLoading, isError}] = useLoginMutation();
   const dispatch = useDispatch();
 
@@ -76,7 +72,7 @@ const Login: FC<Props> = ({navigation}) => {
       } catch (err) {
         console.error(err);
         console.log('isError>>', isError);
-      }
+      } 
     }
   };
 
@@ -89,7 +85,7 @@ const Login: FC<Props> = ({navigation}) => {
         email: userInfo.user.email,
         name: userInfo.user.name,
         photo: userInfo.user.photo,
-      };
+      };      
       dispatch(
         setUser({
           user: data,
@@ -115,6 +111,10 @@ const Login: FC<Props> = ({navigation}) => {
       }
     }
   };
+
+  const logout = async()=>{
+    GoogleSignin.signOut() 
+  }
   return (
     <WapperContainer>
       <KeyboardAvoidingView
@@ -145,7 +145,7 @@ const Login: FC<Props> = ({navigation}) => {
                 secureTextEntry={secureText}
                 secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
                 onPressSecure={() => setSecureText(!secureText)}
-                keyboardType="default"
+                keyboardType="visible-password"
                 isTitleIcon={true}
                 titleIcon={<PasswordSvg />}
               />

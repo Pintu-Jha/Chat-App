@@ -17,7 +17,7 @@ interface User {
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
-  photo:any | null
+  photo: any | null;
 }
 
 interface AuthState {
@@ -25,7 +25,7 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   message: string | null;
-  isLogging : boolean | null
+  isLogging: boolean | null;
 }
 
 const initialState: AuthState = {
@@ -33,7 +33,7 @@ const initialState: AuthState = {
   accessToken: null,
   refreshToken: null,
   message: null,
-  isLogging : false
+  isLogging: false,
 };
 
 const authSlice = createSlice({
@@ -44,7 +44,7 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{
         user: User;
-        accessToken: string |null ;
+        accessToken: string | null;
         refreshToken: string;
         message: string;
       }>,
@@ -53,13 +53,13 @@ const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.message = action.payload.message;
-      state.isLogging = true
+      state.isLogging = true;
     },
     logout: state => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
-      state.isLogging = false
+      state.isLogging = false;
     },
   },
 });

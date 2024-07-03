@@ -1,14 +1,27 @@
-import React from 'react';
-import {Image, SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import React, {useRef} from 'react';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {spacing} from '../styles/spacing';
 import * as Screen from '../screens/index';
 import ImagePath from '../utills/ImagePath';
 import navigationString from './navigationString';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {textScale} from '../styles/responsiveStyles';
+import {Svg} from 'react-native-svg';
+import ChatSvg from '../asset/SVG/ChatSvg';
+import UpdateSvg from '../asset/SVG/UpdateSvg';
+import CommunitiesSvg from '../asset/SVG/CommunitiesSvg';
+import CallSvg from '../asset/SVG/CallSvg';
 
-const activeTabColor = '#6753a3';
-const inActiveTabColor = '#C8C1DF';
+const activeTabColor = '#000';
+const inActiveTabColor = '#000';
 const tabBarColor = '#fffefe';
 
 export type BottomTabsRootStackParams = {
@@ -23,25 +36,25 @@ const tabData = [
   {
     name: navigationString.MESSAGE_SCREEN,
     label: 'Message',
-    icon: ImagePath.IC_MESSAGE,
+    icon: <ChatSvg />,
     component: Screen.ChatsScreen,
   },
   {
     name: navigationString.UPDATE_SCREEN,
-    label: 'Update',
-    icon: ImagePath.IC_UPDATE,
+    label: 'Updates',
+    icon: <UpdateSvg />,
     component: Screen.UpdatesScreen,
   },
   {
     name: navigationString.COMMUNITIES_SCREEN,
     label: 'Communities',
-    icon: ImagePath.IC_COMMUNITES,
+    icon: <CommunitiesSvg />,
     component: Screen.CommunitiesScreen,
   },
   {
     name: navigationString.CALL_SCREEN,
-    label: 'Call',
-    icon: ImagePath.IC_CALL,
+    label: 'Calls',
+    icon: <CallSvg />,
     component: Screen.CallsScreen,
   },
 ];
@@ -58,8 +71,8 @@ function BottomTabs() {
 
             tabBarStyle: {
               backgroundColor: tabBarColor,
-              paddingBottom: 0,
-              height: spacing.HEIGHT_64,
+              paddingBottom: 10,
+              height: spacing.HEIGHT_70,
             },
             headerShown: false,
           }}>
@@ -69,40 +82,35 @@ function BottomTabs() {
                 key={`bottomTabMain_${index.toString()}`}
                 name={item.name as keyof BottomTabsRootStackParams}
                 component={item.component}
-                listeners={{}}
+                listeners={({navigation, route}) => ({})}
                 options={{
                   tabBarLabel: item.label,
                   tabBarIcon: ({focused}) => {
                     return (
-                      <View style={{width: spacing.WIDTH_60}}>
+                      <>
                         <View
                           style={[
-                            {
+                            styles.iconStyle,
+                            focused && {
+                              backgroundColor: '#0cfa0c',
+                              width: spacing.WIDTH_54,
+                              height: spacing.HEIGHT_30,
+                              borderRadius: spacing.RADIUS_16,
                               alignItems: 'center',
-                              paddingVertical: spacing.PADDING_4,
+                              justifyContent: 'center',
+                              opacity: 0.3,
                             },
-                            focused && styles.focusedIconContainer,
-                          ]}
-                        />
-                        <View style={{marginBottom: spacing.MARGIN_14}}>
-                          <Image
-                            source={item.icon}
-                            style={[
-                              styles.iconStyle,
-                              focused && {tintColor: '#6753a3'},
-                            ]}
-                            resizeMode="contain"
-                          />
-
-                          <Text
-                            style={[
-                              styles.label,
-                              focused && {color: '#6753a3'},
-                            ]}>
-                            {item.label}
-                          </Text>
+                          ]}>
+                          <Text style={styles.iconStyle}>{item.icon}</Text>
                         </View>
-                      </View>
+                        <Text
+                          style={[
+                            styles.label,
+                            focused && {color: '#000', fontWeight: 'bold'},
+                          ]}>
+                          {item.label}
+                        </Text>
+                      </>
                     );
                   },
                 }}
@@ -117,25 +125,13 @@ function BottomTabs() {
 
 const styles = StyleSheet.create({
   iconStyle: {
-    height: spacing.HEIGHT_24,
-    width: spacing.HEIGHT_24,
-    tintColor: '#C8C1DF',
-    alignSelf: 'center',
-    resizeMode: 'contain',
-  },
-  focusedIconContainer: {
-    borderTopWidth: 5,
-    borderTopColor: '#6553A7',
+    alignItems: 'center',
   },
   label: {
-    fontSize: textScale(9),
-    color: '#C8C1DF',
+    fontSize: textScale(14),
+    color: '#000',
     opacity: 9,
     alignSelf: 'center',
-  },
-  badgeStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
