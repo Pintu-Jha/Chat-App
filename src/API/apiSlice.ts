@@ -1,21 +1,22 @@
 import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import {RootState} from '../redux/store';
 import {baseUrl} from '../config/url';
+import {USER_DATA, retrieveItem} from '../utills/CustomAsyncStorage';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: baseUrl,
-  prepareHeaders: (headers, {getState,}) => {
-    const token = (getState() as RootState).auth.accessToken
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
+  prepareHeaders: async headers => {
+    try {
+      let token = await retrieveItem(USER_DATA);
+      if (token.accessToken) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      headers.set('Content-Type', 'application/json');
+      headers.set('Accept', 'application/json');
+      headers.set('Access-Control-Allow-Origin', '*');
+      return headers;
+    } catch (error) {
+      console.log('token not found');
     }
-    // if (extra && extra?.idToken) {
-    //   headers.set('Authorization', `Bearer ${extra.idToken}`);
-    // }
-    headers.set('Content-Type', 'application/json');
-    headers.set('Accept', 'application/json');
-    headers.set('Access-Control-Allow-Origin', '*');
-    return headers;
   },
 });
 

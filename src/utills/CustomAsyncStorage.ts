@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const USER_DATA = 'userData';
-export const TIME_OUT_TIME = 'TIME_OUT_TIME';
+export const TOKEN_KEY = 'token';
 
 
 export async function retrieveItem(key: string) {
@@ -42,3 +42,10 @@ export async function clearData() {
     console.error('Error clearing data:', error);
   }
 }
+export const storeToken = async (token: string) => {
+  await AsyncStorage.setItem(TOKEN_KEY, token);
+};
+
+export const getToken = async () => {
+  return await AsyncStorage.getItem(TOKEN_KEY);
+};

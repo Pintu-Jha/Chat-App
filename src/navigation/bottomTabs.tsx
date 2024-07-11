@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {FC, useRef} from 'react';
 import {
   Animated,
   Dimensions,
@@ -10,11 +10,9 @@ import {
 } from 'react-native';
 import {spacing} from '../styles/spacing';
 import * as Screen from '../screens/index';
-import ImagePath from '../utills/ImagePath';
 import navigationString from './navigationString';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {textScale} from '../styles/responsiveStyles';
-import {Svg} from 'react-native-svg';
 import ChatSvg from '../asset/SVG/ChatSvg';
 import UpdateSvg from '../asset/SVG/UpdateSvg';
 import CommunitiesSvg from '../asset/SVG/CommunitiesSvg';
@@ -37,7 +35,7 @@ const tabData = [
     name: navigationString.MESSAGE_SCREEN,
     label: 'Message',
     icon: <ChatSvg />,
-    component: Screen.ChatsScreen,
+    component: Screen.messageScreen,
   },
   {
     name: navigationString.UPDATE_SCREEN,
@@ -71,9 +69,10 @@ function BottomTabs() {
 
             tabBarStyle: {
               backgroundColor: tabBarColor,
-              paddingBottom: 10,
+              paddingBottom: 0,
               height: spacing.HEIGHT_70,
             },
+
             headerShown: false,
           }}>
           {tabData.map((item, index) => {
@@ -90,11 +89,11 @@ function BottomTabs() {
                       <>
                         <View
                           style={[
-                            styles.iconStyle,
+                            styles.iconContainerStyle,
                             focused && {
                               backgroundColor: '#0cfa0c',
                               width: spacing.WIDTH_54,
-                              height: spacing.HEIGHT_30,
+                              height: spacing.HEIGHT_32,
                               borderRadius: spacing.RADIUS_16,
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -124,13 +123,21 @@ function BottomTabs() {
 }
 
 const styles = StyleSheet.create({
-  iconStyle: {
+  iconContainerStyle: {
+    width: spacing.WIDTH_54,
+    height: spacing.HEIGHT_32,
+    borderRadius: spacing.RADIUS_16,
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   label: {
     fontSize: textScale(14),
     color: '#000',
     opacity: 9,
+    alignSelf: 'center',
+  },
+  iconStyle: {
     alignSelf: 'center',
   },
 });
