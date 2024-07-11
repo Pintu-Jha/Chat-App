@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { FC } from 'react'
 
-const Calls = () => {
+const Calls:FC = () => {
   return (
     <View>
-      <Text>Calls</Text>
+      <Text style={{color:'#000',fontSize:30}}>Calls</Text>
     </View>
   )
 }

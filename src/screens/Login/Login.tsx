@@ -24,7 +24,7 @@ import {useLoginMutation} from '../../API/endpoints/authApi';
 import {useDispatch, useSelector} from 'react-redux';
 import {setUser} from '../../redux/slices/authSlice';
 import UserSvg from '../../asset/SVG/UserSvg';
-import {showError} from '../../utills/HelperFuncation';
+import {showError, showSucess} from '../../utills/HelperFuncation';
 import validator from '../../utills/validations';
 import navigationString from '../../navigation/navigationString';
 import {
@@ -41,7 +41,7 @@ const Login: FC<Props> = ({navigation}) => {
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
   const [isGoogleLoading, setIsGoogleLoding] = useState<boolean>(false);
-  const [login, {isLoading, isError}] = useLoginMutation();
+  const [login, {isLoading, isError,error,data,}] = useLoginMutation();
   const dispatch = useDispatch();
 
   const isValidData = () => {
@@ -60,7 +60,7 @@ const Login: FC<Props> = ({navigation}) => {
     if (validations) {
       try {
         const response = await login({password, username}).unwrap();
-        console.log('response>>', response);
+        showSucess(response.message)
         dispatch(
           setUser({
             user: response.data.user,
@@ -70,8 +70,9 @@ const Login: FC<Props> = ({navigation}) => {
           }),
         );
       } catch (err) {
-        console.error(err);
-        console.log('isError>>', isError);
+        const errorMessage = (err as { data?: { message?: string } })?.data?.message;
+        console.log('error>>', errorMessage);
+        showError(errorMessage);
       } 
     }
   };
@@ -112,9 +113,6 @@ const Login: FC<Props> = ({navigation}) => {
     }
   };
 
-  const logout = async()=>{
-    GoogleSignin.signOut() 
-  }
   return (
     <WapperContainer>
       <KeyboardAvoidingView

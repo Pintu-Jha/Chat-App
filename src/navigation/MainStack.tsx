@@ -1,12 +1,15 @@
 import React from 'react';
 import navigationString from './navigationString';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import BottomTabs from './bottomTabs';
+import * as Screen from '../screens/index';
+import bottomTabs from './bottomTabs';
 
- type RootStackParams = {
-  BottomTabs:undefined
+export type MainRootStackParams = {
+  [navigationString.BOTTON_TAB_BAR]: undefined;
+  [navigationString.GetAvailableUser]: undefined;
+  [navigationString.CHAT_SCREEN]: {id: string};
 };
-const Stack = createNativeStackNavigator<RootStackParams>();
+const Stack = createNativeStackNavigator<MainRootStackParams>();
 
 const MainStack: React.FC = () => {
   return (
@@ -19,8 +22,18 @@ const MainStack: React.FC = () => {
           animationTypeForReplace: 'push',
         }}>
         <Stack.Screen
-          name={navigationString.BOTTON_TAB_BAR as keyof RootStackParams}
-          component={BottomTabs}
+          name={navigationString.BOTTON_TAB_BAR}
+          component={bottomTabs}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.GetAvailableUser}
+          component={Screen.GetAvailableUser}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.CHAT_SCREEN}
+          component={Screen.ChatComponents}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

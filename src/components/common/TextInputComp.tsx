@@ -78,5 +78,6 @@ const styles = StyleSheet.create({
     // fontFamily: fontNames.POPPINS_FONT_FAMILY_MEDIUM,
     flex: 1,
     color: '#000',
+    textTransform:'none',
   },
 });

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { FC } from 'react'
 
-const Updates = () => {
+const Updates:FC = () => {
   return (
     <View>
       <Text>Updates</Text>
