@@ -7,7 +7,7 @@ import bottomTabs from './bottomTabs';
 export type MainRootStackParams = {
   [navigationString.BOTTON_TAB_BAR]: undefined;
   [navigationString.GetAvailableUser]: undefined;
-  [navigationString.CHAT_SCREEN]: {id: string};
+  [navigationString.CHAT_SCREEN]: {userId: any;};
 };
 const Stack = createNativeStackNavigator<MainRootStackParams>();
 

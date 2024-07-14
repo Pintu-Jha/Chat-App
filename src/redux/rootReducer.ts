@@ -1,9 +1,11 @@
-import { combineReducers } from '@reduxjs/toolkit';
+import {combineReducers} from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
-import {baseApi } from '../API/apiSlice';
+import createChatSlice from './slices/createChatSlice';
+import {baseApi} from '../API/apiSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  createChat: createChatSlice,
   [baseApi.reducerPath]: baseApi.reducer,
 });
 

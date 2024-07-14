@@ -20,7 +20,7 @@ interface User {
   photo: any | null;
 }
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   accessToken: string | null;
   refreshToken: string | null;

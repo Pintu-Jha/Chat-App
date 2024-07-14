@@ -1,17 +1,15 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {FC, useEffect} from 'react';
+import React, {FC} from 'react';
 import TextComp from '../common/TextComp';
 import {spacing} from '../../styles/spacing';
 import {scale, textScale, width} from '../../styles/responsiveStyles';
-import {RFValue} from 'react-native-responsive-fontsize';
-import {participant} from '../../API/endpoints/mainApi';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 
 interface GetUserChatListColumsProps {
   item: Record<string, any>;
   index?: any;
-  onPressProgram: (item: object) => void | undefined;
+  onPressProgram: (item: object) => void ;
   isLoading?: boolean;
   refetchData?: () => void;
   isError?: boolean;
@@ -28,11 +26,12 @@ const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
       ? item?.participants[1]
       : item?.participants[0];
 
+  const lastMessage = !!item.lastMessage ? item.lastMessage : '';
   return (
     <TouchableOpacity
       style={styles.container}
       activeOpacity={0.7}
-      onPress={() => onPressProgram(item)}>
+      onPress={() => onPressProgram(senderInfo)}>
       <View
         style={{
           flexDirection: 'row',
@@ -46,9 +45,12 @@ const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
         />
         <View style={{marginLeft: spacing.MARGIN_8}}>
           <TextComp text={senderInfo.username} style={styles.nameText} />
+          <Text
+            style={{color: '#000', fontSize: textScale(15), fontWeight: '500'}}>
+            {lastMessage.content}
+          </Text>
         </View>
       </View>
-      <Text>{}</Text>
     </TouchableOpacity>
   );
 };
@@ -66,8 +68,9 @@ const styles = StyleSheet.create({
   nameText: {
     color: '#0F0C1A',
     opacity: 1,
-    fontSize: RFValue(16, 580),
+    fontSize: textScale(24),
     fontWeight: '600',
+    textTransform:'capitalize'
   },
   imageStyle: {
     width: scale(50),

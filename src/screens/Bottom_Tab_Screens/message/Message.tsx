@@ -11,18 +11,23 @@ import {logout} from '../../../redux/slices/authSlice';
 
 type Props = NativeStackScreenProps<MainRootStackParams, 'getAvailableUser'>;
 
-const Message: FC<Props> = ({navigation}) => {
+const Message: FC<Props> = ({navigation,route}) => {
   const dispatch = useDispatch();
   const logOut = () => {
     dispatch(logout());
   };
   return (
     <View style={{flex: 1}}>
-      <Header text="ChatApp" onPress={logOut} />
+      <Header
+        text="ChatApp"
+        onPress={logOut}
+        isForthIcon={true}
+        isRightHeaderContainer={false}
+      />
       <CommonFlotingBotton
         onPress={() => navigation.navigate(navigationString.GetAvailableUser)}
       />
-      <UsersChatListComponent />
+      <UsersChatListComponent navigation={navigation} route={route} />
     </View>
   );
 };

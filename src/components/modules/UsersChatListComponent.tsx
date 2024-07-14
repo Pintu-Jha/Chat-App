@@ -1,9 +1,20 @@
 import {FlatList, RefreshControl, StyleSheet, Text, View} from 'react-native';
 import React, {FC, useEffect, useState} from 'react';
-import {useGetUsersChatListQuery} from '../../API/endpoints/mainApi';
+import {
+  useCreateChatMutation,
+  useGetUsersChatListQuery,
+} from '../../API/endpoints/mainApi';
 import UsersChatListComponentsColums from '../columns/UsersChatListComponentsColums';
+import navigationString from '../../navigation/navigationString';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {MainRootStackParams} from '../../navigation/MainStack';
 
-const UsersChatListComponent: FC = () => {
+type Props = NativeStackScreenProps<
+  MainRootStackParams,
+  typeof navigationString.GetAvailableUser
+>;
+
+const UsersChatListComponent: FC<Props> = ({navigation}) => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const {
     data: userChatListData,
@@ -11,9 +22,15 @@ const UsersChatListComponent: FC = () => {
     refetch: refetchData,
     isError: userChatListError,
   } = useGetUsersChatListQuery();
+  const [createChat] = useCreateChatMutation();
 
-  function onPressProgram(item: Record<string, any>) {
-    // navigation.navigate(navigationString.CHAT_SCREEN, {id: item?._id});
+  async function onPressProgram(item: Record<string, any>) {
+    try {
+      const {data} = await createChat({receiverId: item._id}).unwrap();
+      navigation.navigate(navigationString.CHAT_SCREEN, {userId: data});
+    } catch (error) {
+      console.log(error);
+    }
   }
   const onRefresh = () => {
     setRefreshing(true);
