@@ -1,5 +1,5 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {FC} from 'react';
+import React, {FC, useState} from 'react';
 import TextComp from '../common/TextComp';
 import {spacing} from '../../styles/spacing';
 import {scale, textScale, width} from '../../styles/responsiveStyles';
@@ -47,7 +47,7 @@ const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
           <TextComp text={senderInfo.username} style={styles.nameText} />
           <Text
             style={{color: '#000', fontSize: textScale(15), fontWeight: '500'}}>
-            {lastMessage.content}
+            {lastMessage.content?.substring(0, 20)}
           </Text>
         </View>
       </View>

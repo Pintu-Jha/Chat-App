@@ -3,6 +3,7 @@ import {
   Get_All_Message,
   Get_Available_User,
   Get_User_Chat_List,
+  Send_Message,
 } from '../../config/url';
 import {baseApi} from '../apiSlice';
 
@@ -95,6 +96,15 @@ export interface GetCreateChatResponse {
   message: string;
   success: boolean;
 }
+export interface DeleteMessageResponse {
+  data: {
+    _id: string;
+  };
+  message: string;
+  statusCode: number;
+  success: boolean;
+}
+
 export const mainApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     getAvailableUser: builder.query<GetAvailableUserResponse, void>({
@@ -116,7 +126,20 @@ export const mainApi = baseApi.injectEndpoints({
     getAllMessage: builder.query<GetAllMessageResponse, {roomId: string}>({
       query: ({roomId}) => ({
         url: `${Get_All_Message}/${roomId}`,
-      }),      
+      }),
+    }),
+    sendMessage: builder.mutation<GetAllMessageResponse,{roomId: string; content: string} >({
+      query: ({roomId, content}) => ({
+        url: `${Send_Message}/${roomId}`,
+        method: 'POST',
+        body: {content},
+      }),
+    }),
+    deleteMessage: builder.mutation<DeleteMessageResponse,{roomId: string; selectedItemId: string}>({
+      query: ({roomId, selectedItemId}) => ({
+        url: `${Send_Message}/${roomId}/${selectedItemId}`,
+        method: 'DELETE',
+      }),
     }),
   }),
   overrideExisting: true,
@@ -127,4 +150,6 @@ export const {
   useGetUsersChatListQuery,
   useCreateChatMutation,
   useGetAllMessageQuery,
+  useSendMessageMutation,
+  useDeleteMessageMutation
 } = mainApi;

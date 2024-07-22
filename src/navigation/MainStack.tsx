@@ -7,7 +7,8 @@ import bottomTabs from './bottomTabs';
 export type MainRootStackParams = {
   [navigationString.BOTTON_TAB_BAR]: undefined;
   [navigationString.GetAvailableUser]: undefined;
-  [navigationString.CHAT_SCREEN]: {userId: any;};
+  [navigationString.CHAT_SCREEN]: {userId: any};
+  [navigationString.Profile_Screen]: undefined;
 };
 const Stack = createNativeStackNavigator<MainRootStackParams>();
 
@@ -34,6 +35,11 @@ const MainStack: React.FC = () => {
         <Stack.Screen
           name={navigationString.CHAT_SCREEN}
           component={Screen.ChatComponents}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.Profile_Screen}
+          component={Screen.ProfileScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

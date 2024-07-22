@@ -7,7 +7,8 @@ const navigationString = {
   MESSAGE_SCREEN: 'messageScreen',
   LOGIN_SCREEN:'loginScreen',
   SIGNUP_SCREEN:'signupScreen',
-  GetAvailableUser:'getAvailableUser',
+  GetAvailableUser:'getAvailableUser', 
+  Profile_Screen:'profileScreen', 
 } as const;
 
 export type NavigationString =

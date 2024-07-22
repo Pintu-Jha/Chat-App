@@ -6,6 +6,7 @@ import {
   moderateScale,
   scale,
   textScale,
+  verticalScale,
   width,
 } from '../../styles/responsiveStyles';
 import MenuSvg from '../../asset/SVG/MenuSvg';
@@ -17,7 +18,7 @@ import {fontNames} from '../../styles/typography';
 interface HeaderContainerProps {
   text?: string;
   style?: any;
-  onPress?: () => void;
+  onPressMeanu?: () => void;
   isFirstIcon?: boolean;
   firstIcon?: any;
   isSecondIcon?: boolean;
@@ -30,12 +31,14 @@ interface HeaderContainerProps {
   userDp?: string;
   userNameText?: string;
   leftArrowNavigation?: () => void;
+  onPressThirdIcon?: () => void;
+  isRightHeaderContainerImageWant?: boolean;
 }
 
 const Header: FC<HeaderContainerProps> = ({
   text = '',
   style,
-  onPress,
+  onPressMeanu,
   isFirstIcon = false,
   firstIcon,
   isSecondIcon = false,
@@ -48,6 +51,8 @@ const Header: FC<HeaderContainerProps> = ({
   userDp = 'https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg',
   userNameText,
   leftArrowNavigation,
+  onPressThirdIcon,
+  isRightHeaderContainerImageWant = true,
 }) => {
   return (
     <View style={styles.headerContainer}>
@@ -61,15 +66,17 @@ const Header: FC<HeaderContainerProps> = ({
           <TouchableOpacity onPress={leftArrowNavigation}>
             <LeftArrowSvg />
           </TouchableOpacity>
-          <Image
-            source={{uri: userDp}}
-            style={{
-              width: scale(40),
-              height: scale(40),
-              borderRadius: scale(40) / 2,
-              marginHorizontal: moderateScale(7),
-            }}
-          />
+          {isRightHeaderContainerImageWant ? (
+            <Image
+              source={{uri: userDp}}
+              style={{
+                width: scale(40),
+                height: scale(40),
+                borderRadius: scale(40) / 2,
+                marginLeft: moderateScale(7),
+              }}
+            />
+          ) : null}
           <TextComp text={userNameText} style={styles.userNameTextStyle} />
         </View>
       ) : (
@@ -88,12 +95,14 @@ const Header: FC<HeaderContainerProps> = ({
           </TouchableOpacity>
         ) : null}
         {isThirdIcon ? (
-          <TouchableOpacity style={{marginHorizontal: moderateScale(8)}}>
+          <TouchableOpacity
+            style={{marginHorizontal: moderateScale(8)}}
+            onPress={onPressThirdIcon}>
             <Text>{thirdIcon}</Text>
           </TouchableOpacity>
         ) : null}
         {isForthIcon ? (
-          <TouchableOpacity onPress={onPress}>
+          <TouchableOpacity onPress={onPressMeanu}>
             <Text>{forthIcon}</Text>
           </TouchableOpacity>
         ) : null}
@@ -106,13 +115,12 @@ export default Header;
 
 const styles = StyleSheet.create({
   headerContainer: {
-    // height: spacing.HEIGHT_50,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'space-between',
     flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.PADDING_10,
-    paddingVertical: moderateScale(6),
+    paddingVertical: moderateScale(14),
   },
   headerTextStyle: {
     fontSize: textScale(25),
@@ -129,5 +137,6 @@ const styles = StyleSheet.create({
     fontFamily: fontNames.POPPINS_FONT_FAMILY_BOLD,
     textTransform: 'capitalize',
     color: '#000',
+    marginLeft: moderateScale(7),
   },
 });

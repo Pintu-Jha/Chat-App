@@ -63,9 +63,16 @@ export const authApi = baseApi.injectEndpoints({
         url: `${LOGIN_WITH_GOOGLE}?token=${idToken}`,
       }),
     }),
+    updateUserAvatar: builder.mutation({
+      query: (formData) => ({
+        url: 'users/avatar',
+        method: 'PATCH',
+        body: formData,
+      }),
+    }),
   }),
   overrideExisting: true,
 });
 
-export const {useLoginMutation, useSignupMutation, useLoginWithGoogleMutation} =
+export const {useLoginMutation, useSignupMutation, useLoginWithGoogleMutation,useUpdateUserAvatarMutation} =
   authApi;
