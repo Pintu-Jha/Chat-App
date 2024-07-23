@@ -8,6 +8,8 @@ import UsersChatListComponentsColums from '../columns/UsersChatListComponentsCol
 import navigationString from '../../navigation/navigationString';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {MainRootStackParams} from '../../navigation/MainStack';
+import {useDispatch} from 'react-redux';
+import {createChatData} from '../../redux/slices/createChatSlice';
 
 type Props = NativeStackScreenProps<
   MainRootStackParams,
@@ -15,6 +17,7 @@ type Props = NativeStackScreenProps<
 >;
 
 const UsersChatListComponent: FC<Props> = ({navigation}) => {
+  const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const {
     data: userChatListData,
@@ -23,7 +26,6 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
     isError: userChatListError,
   } = useGetUsersChatListQuery();
   const [createChat] = useCreateChatMutation();
-
   async function onPressProgram(item: Record<string, any>) {
     try {
       const {data} = await createChat({receiverId: item._id}).unwrap();

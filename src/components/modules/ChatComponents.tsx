@@ -37,6 +37,7 @@ import SendSvg from '../../asset/SVG/SendSvg';
 import EmojiSvg from '../../asset/SVG/EmojiSvg';
 import ChatComponentColum from '../columns/ChatComponentColum';
 import DeleteSvg from '../../asset/SVG/DeleteSvg';
+import { localIPAddress } from '../../config/url';
 
 type ChatScreenRouteProp = RouteProp<
   MainRootStackParams,
@@ -56,7 +57,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
   let roomId = userId?.userId?._id;
   const loggedUser = useSelector((state: RootState) => state?.auth);
   const senderInfo = getSenderInfo(loggedUser, userId.userId);
-  const {data} = useGetAllMessageQuery({roomId});
+  const {data,refetch:refetchAllMessage} = useGetAllMessageQuery({roomId});
 
   const [sendMessage] = useSendMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
@@ -64,6 +65,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
   async function onPressSendMessage() {
     try {
       await sendMessage({roomId, content: message}).unwrap();
+      await refetchAllMessage()
       setMessage('');
     } catch (error) {
       console.log(error);
@@ -91,6 +93,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
   const handleDeleteMessage = async (selectedItemId: string) => {
     try {
       await deleteMessage({roomId, selectedItemId}).unwrap();
+      await refetchAllMessage()
       setSelectedItemId(null);
     } catch (error) {
       console.error('Failed to delete message:', error);
@@ -111,7 +114,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
         <Header
           isForthIcon={true}
           isRightHeaderContainer={true}
-          userDp={senderInfo?.avatar?.url}
+          userDp={senderInfo?.avatar?.url.replace("localhost", localIPAddress)}
           userNameText={senderInfo?.username}
           isThirdIcon={true}
           thirdIcon={<CallSvg />}

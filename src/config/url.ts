@@ -1,4 +1,6 @@
-export const baseUrl = 'http://192.168.195.167:8080/api/v1';
+export const localIPAddress = '192.168.195.167';
+
+export const baseUrl = `http://${localIPAddress}:8080/api/v1`;
 
 //authApiEndpoints
 export const SIGN_UP = `/users/register`;
@@ -11,4 +13,5 @@ export const Get_User_Chat_List = '/chat-app/chats';
 export const Create_Chat = '/chat-app/chats/c';
 export const Get_All_Message = '/chat-app/messages';
 export const Send_Message = '/chat-app/messages';
-export const Delete_Message = '/chat-app/messages'
+export const Delete_Message = '/chat-app/messages';
+export const Update_Avatar = '/users/avatar'

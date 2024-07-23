@@ -13,6 +13,7 @@ const baseQuery = fetchBaseQuery({
       headers.set('Content-Type', 'application/json');
       headers.set('Accept', 'application/json');
       headers.set('Access-Control-Allow-Origin', '*');
+      // headers.set('Content-Type','multipart/form-data')
       return headers;
     } catch (error) {
       console.log('token not found');

@@ -2,14 +2,15 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {FC, useState} from 'react';
 import TextComp from '../common/TextComp';
 import {spacing} from '../../styles/spacing';
-import {scale, textScale, width} from '../../styles/responsiveStyles';
+import {scale, textScale, verticalScale, width} from '../../styles/responsiveStyles';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
+import { localIPAddress } from '../../config/url';
 
 interface GetUserChatListColumsProps {
   item: Record<string, any>;
   index?: any;
-  onPressProgram: (item: object) => void ;
+  onPressProgram: (item: object) => void;
   isLoading?: boolean;
   refetchData?: () => void;
   isError?: boolean;
@@ -40,14 +41,14 @@ const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
           paddingVertical: spacing.PADDING_8,
         }}>
         <Image
-          source={{uri: senderInfo.avatar?.url}}
+          source={{uri: senderInfo?.avatar?.url.replace("localhost", localIPAddress)}}
           style={styles.imageStyle}
         />
         <View style={{marginLeft: spacing.MARGIN_8}}>
-          <TextComp text={senderInfo.username} style={styles.nameText} />
+          <TextComp text={senderInfo?.username} style={styles.nameText} />
           <Text
             style={{color: '#000', fontSize: textScale(15), fontWeight: '500'}}>
-            {lastMessage.content?.substring(0, 20)}
+            {lastMessage?.content?.substring(0, 20)}
           </Text>
         </View>
       </View>
@@ -70,12 +71,12 @@ const styles = StyleSheet.create({
     opacity: 1,
     fontSize: textScale(24),
     fontWeight: '600',
-    textTransform:'capitalize'
+    textTransform: 'capitalize',
   },
   imageStyle: {
-    width: scale(50),
-    height: scale(50),
+    width: scale(60),
+    height: scale(60),
     resizeMode: 'cover',
-    borderRadius: scale(50) / 2,
+    borderRadius: scale(60) / 2,
   },
 });

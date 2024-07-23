@@ -1,81 +1,83 @@
 import DocumentPicker from 'react-native-document-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 
-// export async function OpenGallary(callback, options) {
-//   try {
-//     const image = await ImagePicker.openPicker(options);
-//     if (options.multiple && options.multiple == true) {
-//       let images = [];
-//       for (let i = 0; i < image.length; i++) {
-//         var fileNameA = image[i].path.split('/');
-//         var fileName = fileNameA[fileNameA.length - 1];
+export async function OpenGallery(callback, options) {
+  try {
+    const image = await ImagePicker.openPicker(options);
 
-//         let tempImageObject = {
-//           uri: image[i].path,
-//           type: image[i].mime,
-//           name: fileName,
-//         };
-//         images.push(tempImageObject);
-//       }
-//       callback(images);
-//       return images;
-//     } else {
-//       var fileNameA = image.path.split('/');
-//       var fileName = fileNameA[fileNameA.length - 1];
+    if (options.multiple && options.multiple === true) {
+      let images = image.map(img => {
+        const fileName = img.path.split('/').pop();
+        return {
+          uri: img.path,
+          type: img.mime,
+          name: fileName,
+        };
+      });
 
-//       let tempImageObject = {
-//         uri: image.path,
-//         type: image.mime,
-//         name: fileName,
-//       };
-//       callback(tempImageObject);
-//       return tempImageObject;
-//     }
-//   } catch (err) {
-//     // flashMessage(Strings.err_something_went_wrong, 'danger')
-//   }
-// }
+      callback(images);
+      return images;
+    } else {
+      const fileName = image.path.split('/').pop();
+      const tempImageObject = {
+        uri: image.path,
+        type: image.mime,
+        name: fileName,
+      };
 
-// export async function OpenCamera(callback, options) {
-//   try {
-//     const image = await ImagePicker.openCamera(options);
-//     var fileNameA = image.path.split('/');
-//     var fileName = fileNameA[fileNameA.length - 1];
-//     let tempImageObject = {
-//       uri: image.path,
-//       type: image.mime,
-//       name: fileName,
-//     };
-//     callback(tempImageObject);
-//     return tempImageObject;
-//   } catch (error) {
-//     // flashMessage(Strings.err_something_went_wrong, 'danger')
-//   }
-// }
+      callback(tempImageObject);
+      return tempImageObject;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-export const pickDocument = async callback => {
+export async function OpenCamera(callback, options) {
+  try {
+    const image = await ImagePicker.openCamera(options);
+    var fileNameA = image.path.split('/');
+    var fileName = fileNameA[fileNameA.length - 1];
+    let tempImageObject = {
+      uri: image.path,
+      type: image.mime,
+      name: fileName,
+    };
+    callback(tempImageObject);
+    return tempImageObject;
+  } catch (error) {
+    // flashMessage(Strings.err_something_went_wrong, 'danger')
+  }
+}
+
+export const pickDocument = async (callback) => {
   try {
     const res = await DocumentPicker.pickSingle({
       type: [DocumentPicker.types.pdf, DocumentPicker.types.images],
     });
-
     if (!res) {
-      console.warn('No document selected.');
+      console.error('No document selected.');
       return;
     }
-    const {fileCopyUri, uri, type, name, size} = res;
 
-    if (!uri || !fileCopyUri || !type || !name || size === undefined || null) {
-      console.warn('Incomplete file details:', res);
+    const { uri, type, name, size } = res;
+
+    if (!uri || !type || !name ) {
+      console.error('Incomplete or invalid file details:', res);
       return;
     }
+
     const selectedFile = {
       uri,
       type,
       name,
-      size,
-      fileCopyUri
     };
-    callback(selectedFile);
+
+    if (typeof callback === 'function') {
+      callback(selectedFile);
+    } else {
+      console.error('Callback is not a function');
+    }
   } catch (error) {
     if (DocumentPicker.isCancel(error)) {
       console.log('Document picking cancelled.');
