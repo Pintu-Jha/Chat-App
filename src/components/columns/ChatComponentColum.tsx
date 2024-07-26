@@ -9,7 +9,11 @@ import React, {FC} from 'react';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
-import {formatTimestamp} from '../../utills/HelperFuncation';
+import {
+  formatTimestamp,
+  getColorForParticipant,
+} from '../../utills/HelperFuncation';
+import VirtualizedView from '../common/VirtualizedView';
 
 interface GetChatListColumsProps {
   item: Record<string, any>;
@@ -31,50 +35,62 @@ const ChatComponentColum = ({
   isSelected,
 }: GetChatListColumsProps) => {
   const loggedUser = useSelector((state: RootState) => state?.auth?.user?._id);
+  const participantColor = getColorForParticipant(item.sender?._id);
   return (
-    <TouchableOpacity
-      onLongPress={() => {
-        if (onLongPressStart) onLongPressStart();
-      }}
-      onPressOut={() => {
-        if (onLongPressEnd) onLongPressEnd();
-      }}
-      style={[isSelected ? styles.selectedMessage : null]}
-      activeOpacity={0.6}>
-      <View
-        style={[
-          styles.chatContainer,
-          item?.sender?._id === loggedUser
-            ? styles.sentMessage
-            : styles.receivedMessage,
-        ]}>
+    <VirtualizedView style={{backgroundColor: '#ece5dd'}}>
+      <TouchableOpacity
+        onLongPress={() => {
+          if (onLongPressStart) onLongPressStart();
+        }}
+        onPressOut={() => {
+          if (onLongPressEnd) onLongPressEnd();
+        }}
+        style={[isSelected ? styles.selectedMessage : null]}
+        activeOpacity={0.6}>
         <View
           style={[
-            styles.messageContainer,
+            styles.chatContainer,
             item?.sender?._id === loggedUser
               ? styles.sentMessage
               : styles.receivedMessage,
           ]}>
-          <Text
-            style={{
-              color: '#000',
-              fontSize: textScale(16),
-              fontWeight: '400',
-            }}>
-            {item.content}
-          </Text>
-          <Text
+          <View
             style={[
+              styles.messageContainer,
               item?.sender?._id === loggedUser
-                ? styles.sentTimeText
-                : styles.receivedTimeText,
-              styles.timetextStyle,
+                ? styles.sentMessage
+                : styles.receivedMessage,
             ]}>
-            {formatTimestamp(item.createdAt)}
-          </Text>
+            <Text
+              style={{
+                color: participantColor,
+                fontSize: textScale(16),
+                fontWeight: 'bold',
+                textTransform: 'capitalize',
+              }}>
+              {item?.sender?.username}
+            </Text>
+            <Text
+              style={{
+                color: '#000',
+                fontSize: textScale(16),
+                fontWeight: '400',
+              }}>
+              {item.content}
+            </Text>
+            <Text
+              style={[
+                item?.sender?._id === loggedUser
+                  ? styles.sentTimeText
+                  : styles.receivedTimeText,
+                styles.timetextStyle,
+              ]}>
+              {formatTimestamp(item.createdAt)}
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </VirtualizedView>
   );
 };
 

@@ -36,7 +36,7 @@ const GetAvailableUserListcomponent: FC<Props> = ({navigation}) => {
           message: data?.message,
           success: data?.success,
         }),
-      )
+      );
       navigation.navigate(navigationString.CHAT_SCREEN, {userId: data});
     } catch (error) {
       console.log(error);

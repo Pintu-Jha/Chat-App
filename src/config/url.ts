@@ -1,4 +1,4 @@
-export const localIPAddress = '192.168.195.167';
+export const localIPAddress = '192.168.32.167';
 
 export const baseUrl = `http://${localIPAddress}:8080/api/v1`;
 
@@ -14,4 +14,5 @@ export const Create_Chat = '/chat-app/chats/c';
 export const Get_All_Message = '/chat-app/messages';
 export const Send_Message = '/chat-app/messages';
 export const Delete_Message = '/chat-app/messages';
-export const Update_Avatar = '/users/avatar'
+export const Update_Avatar = '/users/avatar';
+export const Delete_Group_chat = '/chat-app/chats/group';

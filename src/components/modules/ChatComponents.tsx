@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {MainRootStackParams} from '../../navigation/MainStack';
 import navigationString from '../../navigation/navigationString';
@@ -37,7 +37,9 @@ import SendSvg from '../../asset/SVG/SendSvg';
 import EmojiSvg from '../../asset/SVG/EmojiSvg';
 import ChatComponentColum from '../columns/ChatComponentColum';
 import DeleteSvg from '../../asset/SVG/DeleteSvg';
-import { localIPAddress } from '../../config/url';
+import {localIPAddress} from '../../config/url';
+import {useSocket} from '../../context/SocketContext';
+import {ChatListItemInterface, ChatMessageInterface} from '../interfaces/chat';
 
 type ChatScreenRouteProp = RouteProp<
   MainRootStackParams,
@@ -46,31 +48,36 @@ type ChatScreenRouteProp = RouteProp<
 type ChatScreenProps = {
   route: ChatScreenRouteProp;
 };
+const CONNECTED_EVENT = 'connect';
+const DISCONNECT_EVENT = 'disconnect';
+const JOIN_CHAT_EVENT = 'joinChat';
+const NEW_CHAT_EVENT = 'newChat';
+const TYPING_EVENT = 'typing';
+const STOP_TYPING_EVENT = 'stopTyping';
+const MESSAGE_RECEIVED_EVENT = 'messageReceived';
+const LEAVE_CHAT_EVENT = 'leaveChat';
+const UPDATE_GROUP_NAME_EVENT = 'updateGroupName';
+const MESSAGE_DELETE_EVENT = 'messageDeleted';
 
 const ChatComponents: FC<ChatScreenProps> = ({route}) => {
-  const [message, setMessage] = useState<string>('');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [firstSelectionDone, setFirstSelectionDone] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
   const navigation = useNavigation();
   const userId = route.params;
+
   let roomId = userId?.userId?._id;
+
   const loggedUser = useSelector((state: RootState) => state?.auth);
   const senderInfo = getSenderInfo(loggedUser, userId.userId);
-  const {data,refetch:refetchAllMessage} = useGetAllMessageQuery({roomId});
+  const {data, refetch: refetchAllMessage} = useGetAllMessageQuery(
+    {roomId},
+    {skip: !roomId},
+  );
 
   const [sendMessage] = useSendMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
-
-  async function onPressSendMessage() {
-    try {
-      await sendMessage({roomId, content: message}).unwrap();
-      await refetchAllMessage()
-      setMessage('');
-    } catch (error) {
-      console.log(error);
-    }
-  }
   const handleLongPressStart = (itemId: string) => {
     if (firstSelectionDone) {
       setSelectedItemId(prevItemId => (prevItemId === itemId ? null : itemId));
@@ -93,13 +100,115 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
   const handleDeleteMessage = async (selectedItemId: string) => {
     try {
       await deleteMessage({roomId, selectedItemId}).unwrap();
-      await refetchAllMessage()
+
       setSelectedItemId(null);
     } catch (error) {
       console.error('Failed to delete message:', error);
     }
   };
 
+  //socket
+
+  const {socket} = useSocket();
+  const currentChat = useRef<ChatListItemInterface | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [openAddChat, setOpenAddChat] = useState(false);
+  const [loadingChats, setLoadingChats] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+
+  const [messages, setMessages] = useState<ChatMessageInterface[]>([]);
+  const [chats, setChats] = useState<ChatListItemInterface[]>([]);
+
+  const [unreadMessages, setUnreadMessages] = useState<ChatMessageInterface[]>(
+    [],
+  );
+
+  const [isTyping, setIsTyping] = useState(false);
+  const [selfTyping, setSelfTyping] = useState(false);
+
+  const [localSearchQuery, setLocalSearchQuery] = useState('');
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+
+  const onConnect = () => {
+    setIsConnected(true);
+  };
+
+  const onDisconnect = () => {
+    setIsConnected(false);
+  };
+
+  const onMessageReceived = (message: ChatMessageInterface) => {
+    if (message?.chat !== roomId) {
+      setUnreadMessages(prev => [message, ...prev]);
+    } else {
+      setMessages(prev => [message, ...prev]);
+    }
+    // updateChatLastMessage(message.chat || "", message);
+  };
+  const getChats = async () => {
+    setChats(data?.data || []);
+  };
+
+  const getMessages = async () => {
+    if (!roomId) return Alert.alert('No chat is selected');
+    setLoadingMessages(true);
+    try {
+      setMessages(data?.data || []);
+    } catch (error) {
+      console.error('Failed to fetch messages:', error);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const sendChatMessage = async () => {
+    if (!roomId || !socket) return;
+    socket.emit(STOP_TYPING_EVENT, roomId);
+
+    try {
+      const response = await sendMessage({roomId, content: message}).unwrap();
+      const newMessage = response.data;
+
+      setMessage('');
+      setAttachedFiles([]);
+      setMessages(prev => [newMessage, ...prev]);
+
+      refetchAllMessage();
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  };
+  const onNewChat = (chat: ChatListItemInterface) => {
+    setChats(prev => [chat, ...prev]);
+  };
+  useEffect(() => {
+    if (roomId) {
+      socket?.emit(JOIN_CHAT_EVENT, roomId);
+      getMessages();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on(CONNECTED_EVENT, onConnect);
+    socket.on(DISCONNECT_EVENT, onDisconnect);
+    socket.on(MESSAGE_RECEIVED_EVENT, onMessageReceived);
+    socket.on(NEW_CHAT_EVENT, onNewChat);
+
+    return () => {
+      socket.off(CONNECTED_EVENT, onConnect);
+      socket.off(DISCONNECT_EVENT, onDisconnect);
+      socket.off(MESSAGE_RECEIVED_EVENT, onMessageReceived);
+      socket.off(NEW_CHAT_EVENT, onNewChat);
+    };
+  }, [socket]);
+  useEffect(() => {
+    if (data) {
+      setMessages(data.data);
+    }
+  }, [data]);
   return (
     <View style={{flex: 1, backgroundColor: '#ece5dd'}}>
       {selectedItemId ? (
@@ -114,8 +223,10 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
         <Header
           isForthIcon={true}
           isRightHeaderContainer={true}
-          userDp={senderInfo?.avatar?.url.replace("localhost", localIPAddress)}
-          userNameText={senderInfo?.username}
+          userDp={senderInfo?.avatar?.url.replace('localhost', localIPAddress)}
+          userNameText={
+            userId.userId.isGroupChat ? userId.userId.name : senderInfo.username
+          }
           isThirdIcon={true}
           thirdIcon={<CallSvg />}
           isSecondIcon={true}
@@ -127,7 +238,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
       )}
       <View style={{flex: 1}}>
         <FlatList
-          data={data?.data}
+          data={messages}
           keyExtractor={item => item._id.toString()}
           inverted={true}
           renderItem={({item, index}) => (
@@ -161,7 +272,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route}) => {
         <TouchableOpacity
           style={styles.sendIconContainer}
           activeOpacity={0.6}
-          onPress={onPressSendMessage}>
+          onPress={sendChatMessage}>
           <Text>
             <SendSvg />
           </Text>

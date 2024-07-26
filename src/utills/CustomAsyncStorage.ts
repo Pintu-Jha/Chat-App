@@ -46,6 +46,6 @@ export const storeToken = async (token: string) => {
   await AsyncStorage.setItem(TOKEN_KEY, token);
 };
 
-export const getToken = async () => {
+export const getToken = async (TOKEN_KEY: string) => {
   return await AsyncStorage.getItem(TOKEN_KEY);
 };

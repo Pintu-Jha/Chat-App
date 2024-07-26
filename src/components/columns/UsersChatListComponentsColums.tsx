@@ -2,10 +2,15 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {FC, useState} from 'react';
 import TextComp from '../common/TextComp';
 import {spacing} from '../../styles/spacing';
-import {scale, textScale, verticalScale, width} from '../../styles/responsiveStyles';
+import {
+  scale,
+  textScale,
+  verticalScale,
+  width,
+} from '../../styles/responsiveStyles';
 import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
-import { localIPAddress } from '../../config/url';
+import {localIPAddress} from '../../config/url';
 
 interface GetUserChatListColumsProps {
   item: Record<string, any>;
@@ -14,13 +19,18 @@ interface GetUserChatListColumsProps {
   isLoading?: boolean;
   refetchData?: () => void;
   isError?: boolean;
+  onLongPressStart?: () => void;
+  onLongPressEnd?: () => void;
+  isSelected?: boolean;
 }
 const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
   item,
-  isLoading,
-  isError,
+  onLongPressStart,
+  onLongPressEnd,
   onPressProgram,
+  isSelected,
 }) => {
+
   const loggedUser = useSelector((state: RootState) => state?.auth);
   const senderInfo =
     item?.participants[0]?._id === loggedUser?.user?._id
@@ -30,9 +40,15 @@ const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
   const lastMessage = !!item.lastMessage ? item.lastMessage : '';
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[isSelected ? styles.selectedMessage : null, styles.container]}
       activeOpacity={0.7}
-      onPress={() => onPressProgram(senderInfo)}>
+      onPress={() => onPressProgram(item)}
+      onLongPress={() => {
+        if (onLongPressStart) onLongPressStart();
+      }}
+      onPressOut={() => {
+        if (onLongPressEnd) onLongPressEnd();
+      }}>
       <View
         style={{
           flexDirection: 'row',
@@ -41,11 +57,16 @@ const UsersChatListComponentsColums: FC<GetUserChatListColumsProps> = ({
           paddingVertical: spacing.PADDING_8,
         }}>
         <Image
-          source={{uri: senderInfo?.avatar?.url.replace("localhost", localIPAddress)}}
+          source={{
+            uri: senderInfo?.avatar?.url.replace('localhost', localIPAddress),
+          }}
           style={styles.imageStyle}
         />
         <View style={{marginLeft: spacing.MARGIN_8}}>
-          <TextComp text={senderInfo?.username} style={styles.nameText} />
+          <TextComp
+            text={item.isGroupChat ? item.name : senderInfo?.username}
+            style={styles.nameText}
+          />
           <Text
             style={{color: '#000', fontSize: textScale(15), fontWeight: '500'}}>
             {lastMessage?.content?.substring(0, 20)}
@@ -61,7 +82,7 @@ export default UsersChatListComponentsColums;
 const styles = StyleSheet.create({
   container: {
     marginTop: spacing.MARGIN_16,
-    marginHorizontal: spacing.MARGIN_20,
+    paddingHorizontal: spacing.MARGIN_20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -78,5 +99,8 @@ const styles = StyleSheet.create({
     height: scale(60),
     resizeMode: 'cover',
     borderRadius: scale(60) / 2,
+  },
+  selectedMessage: {
+    backgroundColor: '#a2efbf',
   },
 });

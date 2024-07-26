@@ -32,6 +32,7 @@ import {
   isErrorWithCode,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import { storeItem, storeToken, TOKEN_KEY, USER_DATA } from '../../utills/CustomAsyncStorage';
 
 
 type Props = NativeStackScreenProps<AuthStackParams, 'loginScreen'>;
@@ -60,6 +61,7 @@ const Login: FC<Props> = ({navigation}) => {
     if (validations) {
       try {
         const response = await login({password, username}).unwrap();
+        await storeToken(response.data.accessToken)
         showSucess(response.message)
         dispatch(
           setUser({
@@ -68,7 +70,7 @@ const Login: FC<Props> = ({navigation}) => {
             refreshToken: response.data.refreshToken,
             message: response.message,
           }),
-        );
+        );        
       } catch (err) {
         const errorMessage = (err as { data?: { message?: string } })?.data?.message;
         console.log('error>>', errorMessage);

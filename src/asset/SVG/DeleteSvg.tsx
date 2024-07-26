@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Svg, {SvgProps, Path} from 'react-native-svg';
-const DeleteSvg = ({width = 30, height = 30, ...props}: SvgProps) => (
+const DeleteSvg = ({width = 25, height = 25, ...props}: SvgProps) => (
   <Svg width={width} height={height} fill="none" viewBox="0 0 24 24" {...props}>
     <Path
       stroke="#000"
