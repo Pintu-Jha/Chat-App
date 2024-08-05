@@ -16,7 +16,8 @@ import {pickDocument} from '../../utills/commonImagePicker';
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../../redux/slices/authSlice';
 import {RootState} from '../../redux/store';
-import { localIPAddress } from '../../config/url';
+import {localIPAddress} from '../../config/url';
+import {clearAsyncKeyData, USER_DATA} from '../../utills/CustomAsyncStorage';
 
 type Props = NativeStackScreenProps<MainRootStackParams, 'profileScreen'>;
 
@@ -37,17 +38,17 @@ const Profile: FC<Props> = ({navigation}) => {
       } catch (error) {
         console.error('Image upload failed:', error);
       }
-    }),{
-      cropping: true, // Example option
-      multiple: false // Ensure single image selection
-    };
+    }),
+      {
+        cropping: true, // Example option
+        multiple: false, // Ensure single image selection
+      };
   };
-  const handaleLogout = () => {
+  const handaleLogout = async () => {
     dispatch(logout());
+    await clearAsyncKeyData(USER_DATA);
   };
-  const profile = useSelector(
-    (state: RootState) => state?.auth?.user,
-  );
+  const profile = useSelector((state: RootState) => state?.auth?.user);
   return (
     <View>
       <Header
@@ -61,7 +62,7 @@ const Profile: FC<Props> = ({navigation}) => {
           <Image
             source={{
               uri:
-                profile?.avatar?.url||
+                profile?.avatar?.url ||
                 'https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg',
             }}
             style={styles.DPStyle}

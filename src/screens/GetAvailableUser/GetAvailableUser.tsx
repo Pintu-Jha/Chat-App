@@ -4,14 +4,15 @@ import GetAvailableUserListcomponent from '../../components/modules/GetAvailable
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainRootStackParams } from '../../navigation/MainStack';
 import navigationString from '../../navigation/navigationString';
+import VirtualizedView from '../../components/common/VirtualizedView';
 
 type Props = NativeStackScreenProps<MainRootStackParams, typeof navigationString.GetAvailableUser>;
 
 const GetAvailableUser:FC<Props> = ({navigation,route}) => { 
   return (
-    <View>
+    <VirtualizedView>
      <GetAvailableUserListcomponent navigation={navigation} route={route}/>
-    </View>
+    </VirtualizedView>
   )
 }
 

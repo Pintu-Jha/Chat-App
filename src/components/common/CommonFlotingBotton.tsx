@@ -2,22 +2,29 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React, {FC} from 'react';
 import {spacing} from '../../styles/spacing';
 import AddSvg from '../../asset/SVG/AddSvg';
+import {
+  moderateScale,
+  scale,
+  verticalScale,
+} from '../../styles/responsiveStyles';
 
 interface CommonFlotingBottonProps {
   onPress?: () => void;
   activeOpacity?: number;
+  Icon?: any;
 }
 
 const CommonFlotingBotton: FC<CommonFlotingBottonProps> = ({
   onPress,
   activeOpacity = 0.8,
+  Icon,
 }) => {
   return (
     <TouchableOpacity
       style={styles.bottonContainer}
       activeOpacity={activeOpacity}
       onPress={onPress}>
-      <AddSvg />
+      {Icon}
     </TouchableOpacity>
   );
 };
@@ -26,13 +33,13 @@ export default CommonFlotingBotton;
 
 const styles = StyleSheet.create({
   bottonContainer: {
-    width: spacing.WIDTH_54,
-    height: spacing.HEIGHT_54,
-    borderRadius: spacing.RADIUS_16,
+    width: scale(54),
+    height: scale(54),
+    borderRadius: moderateScale(16),
     backgroundColor: 'green',
     position: 'absolute',
-    bottom: spacing.HEIGHT_30,
-    right: spacing.WIDTH_20,
+    bottom: verticalScale(30),
+    right: scale(20),
     alignItems: 'center',
     justifyContent: 'center',
   },

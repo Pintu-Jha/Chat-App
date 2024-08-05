@@ -7,6 +7,6 @@ export interface UserInterface {
   };
   username: string;
   email: string;
-  createdAt: string;
-  updatedAt: string;
+  // createdAt: string;
+  // updatedAt: string;
 }

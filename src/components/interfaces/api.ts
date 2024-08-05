@@ -1,7 +1,8 @@
+import { ChatListItemInterface } from "./chat";
 
 export interface APISuccessResponseInterface {
-  data: any;
-  message: string;
-  statusCode: number;
+  statusCode: number ;
+  data: any ;
+  message: string ;
   success: boolean;
 }

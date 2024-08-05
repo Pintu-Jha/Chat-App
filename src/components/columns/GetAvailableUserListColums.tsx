@@ -2,16 +2,19 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
 import {spacing} from '../../styles/spacing';
 import TextComp from '../common/TextComp';
-import {scale, textScale} from '../../styles/responsiveStyles';
+import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
 import LoadingScreen from '../../components/common/Loader';
+import {UserInterface} from '../interfaces/user';
+import CheckMark from '../../asset/SVG/CheckMarkSvg';
 
 interface GetAvailableUserListColumsProps {
-  item: Record<string, any>;
+  item: UserInterface;
   index?: any;
-  onPressProgram: (item: Record<string, any>) => void;
+  onPressProgram: (item: UserInterface) => void;
   isLoading?: boolean;
   refetchData?: () => void;
   isError?: boolean;
+  isSelected?: boolean;
 }
 
 const GetAvailableUserListColums = ({
@@ -19,9 +22,8 @@ const GetAvailableUserListColums = ({
   isLoading,
   isError,
   onPressProgram,
-}: // navigation
-GetAvailableUserListColumsProps) => {
-
+  isSelected,
+}: GetAvailableUserListColumsProps) => {
   return (
     <>
       {isLoading ? (
@@ -36,14 +38,17 @@ GetAvailableUserListColumsProps) => {
               flexDirection: 'row',
               alignItems: 'center',
               flex: 1,
-              paddingVertical: spacing.PADDING_8,
             }}>
             <Image source={{uri: item.avatar.url}} style={styles.imageStyle} />
-            <View style={{marginLeft: spacing.MARGIN_8}}>
+            <View style={{}}>
               <TextComp text={item.username} style={styles.nameText} />
             </View>
           </View>
-          <Text>{}</Text>
+          {isSelected && (
+            <Text style={{position: 'absolute', bottom: 0, left: scale(35)}}>
+              <CheckMark />
+            </Text>
+          )}
         </TouchableOpacity>
       )}
     </>
@@ -54,7 +59,7 @@ export default GetAvailableUserListColums;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: spacing.MARGIN_16,
+    marginVertical: spacing.MARGIN_16,
     marginHorizontal: spacing.MARGIN_20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -65,12 +70,13 @@ const styles = StyleSheet.create({
     opacity: 1,
     fontSize: textScale(16),
     fontWeight: '600',
+    textTransform: 'capitalize',
+    marginLeft: moderateScale(12),
   },
   imageStyle: {
     width: scale(50),
     height: scale(50),
-    resizeMode: 'contain',
-    borderRadius: scale(50)/2,
-    backgroundColor:"#000"
+    resizeMode: 'cover',
+    borderRadius: scale(50) / 2,
   },
 });

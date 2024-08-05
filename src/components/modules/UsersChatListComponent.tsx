@@ -2,15 +2,16 @@ import {FlatList, RefreshControl, StyleSheet, Text, View} from 'react-native';
 import React, {FC, useEffect, useRef, useState} from 'react';
 import {
   useCreateChatMutation,
+  useDeleteChatMutation,
   useDeleteGroupChatMutation,
+  useGetAllMessageQuery,
   useGetUsersChatListQuery,
 } from '../../API/endpoints/mainApi';
 import UsersChatListComponentsColums from '../columns/UsersChatListComponentsColums';
 import navigationString from '../../navigation/navigationString';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {MainRootStackParams} from '../../navigation/MainStack';
-import {useDispatch, useSelector} from 'react-redux';
-import {createChatData} from '../../redux/slices/createChatSlice';
+import {useSelector} from 'react-redux';
 import {RootState} from '../../redux/store';
 import Header from '../common/Header';
 import CameraSvg from '../../asset/SVG/CameraSvg';
@@ -18,7 +19,14 @@ import QrCodeSvg from '../../asset/SVG/QrCodeSvg';
 import DeleteSvg from '../../asset/SVG/DeleteSvg';
 import {showSucess} from '../../utills/HelperFuncation';
 import TextComp from '../common/TextComp';
-import { moderateScale, scale, textScale, verticalScale } from '../../styles/responsiveStyles';
+import {
+  moderateScale,
+  scale,
+  textScale,
+  verticalScale,
+} from '../../styles/responsiveStyles';
+import {ChatListItemInterface} from '../interfaces/chat';
+import LoadingScreen from '../common/Loader';
 
 type Props = NativeStackScreenProps<
   MainRootStackParams,
@@ -30,7 +38,10 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [firstSelectionDone, setFirstSelectionDone] = useState<boolean>(false);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+  const [isToggalMenuBotton, setIsToggalMenuBotton] = useState<boolean>(false);
   const loggedUser = useSelector((state: RootState) => state?.auth);
+  const [chats, setChats] = useState<ChatListItemInterface[]>([]);
+  const [checkDeleteChats, setCheckDeleteChats] = useState<boolean>(false);
 
   const {
     data: userChatListData,
@@ -38,9 +49,27 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
     refetch: refetchData,
     isError: userChatListError,
   } = useGetUsersChatListQuery();
-
+  const updateLastMessages = useSelector(
+    (state: RootState) => state?.updateLastMessage.lastMessageUpdate,
+  );
+  const UnreadeMessageCount = useSelector(
+    (state: RootState) => state?.UnreadeMessageCount.UnreadeMessageCount,
+  );
   const [createChat] = useCreateChatMutation();
   const [deleteGroupCHat] = useDeleteGroupChatMutation();
+  const [deleteChat] = useDeleteChatMutation();
+
+  useEffect(() => {
+    if (userChatListData) {
+      setChats(userChatListData?.data || []);
+    }
+  }, [userChatListData]);
+
+  useEffect(() => {
+    if (updateLastMessages) {
+      setChats(updateLastMessages);
+    }
+  }, [updateLastMessages]);
   async function onPressProgram(item: Record<string, any>) {
     const senderInfo =
       item?.participants[0]?._id === loggedUser?.user?._id
@@ -63,9 +92,10 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
     refetchData().finally(() => setRefreshing(false));
   };
 
-  const handleLongPressStart = (itemId: string) => {
+  const handleLongPressStart = (itemId: string, isGroupChat: boolean) => {
     if (firstSelectionDone) {
       setSelectedItemId(prevItemId => (prevItemId === itemId ? null : itemId));
+      setCheckDeleteChats(isGroupChat);
       return;
     }
 
@@ -82,27 +112,26 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
       setPressTimer(null);
     }
   };
-  const [isToggalMenuBotton, setIsToggalMenuBotton] = useState<boolean>(false);
   const ToggalMenuBotton = () => {
     setIsToggalMenuBotton(!isToggalMenuBotton);
   };
 
   async function handleDeleteChat(chatId: string) {
     try {
-      const data = await deleteGroupCHat({chatId}).unwrap();
+      if (checkDeleteChats) {
+        const data = await deleteGroupCHat({chatId}).unwrap();
+        showSucess(data.message);
+      } else {
+        const data = await deleteChat({chatId}).unwrap();
+        showSucess(data.message);
+      }
       await refetchData();
       setSelectedItemId(null);
-      showSucess(data.message);
     } catch (error) {
       // showError(error?.data?.message)
       setSelectedItemId(null);
     }
   }
-
-  //socket
-
- 
-
   return (
     <View>
       {selectedItemId ? (
@@ -126,22 +155,33 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
         />
       )}
       <FlatList
-        data={userChatListData?.data}
+        data={chats}
         keyExtractor={(item, index) => String(item._id)}
         renderItem={({item, index}) => {
           return (
-            <UsersChatListComponentsColums
-              item={item}
-              index={index}
-              isLoading={userChatListLoding}
-              key={'GetUserChatListColums' + index}
-              refetchData={refetchData}
-              isError={userChatListError}
-              onPressProgram={onPressProgram}
-              isSelected={item._id === selectedItemId}
-              onLongPressStart={() => handleLongPressStart(item._id)}
-              onLongPressEnd={handleLongPressEnd}
-            />
+            <>
+              {userChatListLoding ? (
+                <LoadingScreen />
+              ) : (
+                <UsersChatListComponentsColums
+                  item={item}
+                  index={index}
+                  key={'GetUserChatListColums' + index}
+                  refetchData={refetchData}
+                  isError={userChatListError}
+                  onPressProgram={onPressProgram}
+                  isSelected={item._id === selectedItemId}
+                  onLongPressStart={() =>
+                    handleLongPressStart(item._id, item.isGroupChat)
+                  }
+                  onLongPressEnd={handleLongPressEnd}
+                  unreadCount={
+                    UnreadeMessageCount?.filter(n => n.chat === item?._id)
+                      .length
+                  }
+                />
+              )}
+            </>
           );
         }}
         refreshControl={

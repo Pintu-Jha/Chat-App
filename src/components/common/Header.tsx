@@ -33,6 +33,8 @@ interface HeaderContainerProps {
   leftArrowNavigation?: () => void;
   onPressThirdIcon?: () => void;
   isRightHeaderContainerImageWant?: boolean;
+  typing?: boolean;
+  getChatDetails?:()=> void
 }
 
 const Header: FC<HeaderContainerProps> = ({
@@ -53,6 +55,8 @@ const Header: FC<HeaderContainerProps> = ({
   leftArrowNavigation,
   onPressThirdIcon,
   isRightHeaderContainerImageWant = true,
+  typing = false,
+  getChatDetails
 }) => {
   return (
     <View style={styles.headerContainer}>
@@ -77,7 +81,19 @@ const Header: FC<HeaderContainerProps> = ({
               }}
             />
           ) : null}
-          <TextComp text={userNameText} style={styles.userNameTextStyle} />
+          <View
+            style={{
+              flexDirection: 'column',
+              justifyContent: 'space-around',
+              marginLeft: moderateScale(7),
+            }}>
+           <TouchableOpacity onPress={getChatDetails} activeOpacity={1}>
+           <TextComp text={userNameText} style={styles.userNameTextStyle} />
+           </TouchableOpacity>
+            {typing ? (
+              <TextComp text="typing..." style={styles.typingStyle} />
+            ) : null}
+          </View>
         </View>
       ) : (
         <TextComp text={text} style={{...styles.headerTextStyle, ...style}} />
@@ -137,6 +153,10 @@ const styles = StyleSheet.create({
     fontFamily: fontNames.POPPINS_FONT_FAMILY_BOLD,
     textTransform: 'capitalize',
     color: '#000',
-    marginLeft: moderateScale(7),
+  },
+  typingStyle: {
+    color: '#25D366',
+    fontSize: textScale(14),
+    fontWeight: 'bold',
   },
 });

@@ -32,8 +32,12 @@ import {
   isErrorWithCode,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import { storeItem, storeToken, TOKEN_KEY, USER_DATA } from '../../utills/CustomAsyncStorage';
-
+import {
+  storeItem,
+  storeToken,
+  TOKEN_KEY,
+  USER_DATA,
+} from '../../utills/CustomAsyncStorage';
 
 type Props = NativeStackScreenProps<AuthStackParams, 'loginScreen'>;
 
@@ -42,7 +46,7 @@ const Login: FC<Props> = ({navigation}) => {
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
   const [isGoogleLoading, setIsGoogleLoding] = useState<boolean>(false);
-  const [login, {isLoading, isError,error,data,}] = useLoginMutation();
+  const [login, {isLoading, isError, error, data}] = useLoginMutation();
   const dispatch = useDispatch();
 
   const isValidData = () => {
@@ -61,8 +65,9 @@ const Login: FC<Props> = ({navigation}) => {
     if (validations) {
       try {
         const response = await login({password, username}).unwrap();
-        await storeToken(response.data.accessToken)
-        showSucess(response.message)
+        await storeItem(USER_DATA, response.data);
+        await storeToken(response.data.accessToken);
+        showSucess(response.message);
         dispatch(
           setUser({
             user: response.data.user,
@@ -70,12 +75,13 @@ const Login: FC<Props> = ({navigation}) => {
             refreshToken: response.data.refreshToken,
             message: response.message,
           }),
-        );        
+        );
       } catch (err) {
-        const errorMessage = (err as { data?: { message?: string } })?.data?.message;
+        const errorMessage = (err as {data?: {message?: string}})?.data
+          ?.message;
         console.log('error>>', errorMessage);
         showError(errorMessage);
-      } 
+      }
     }
   };
 
@@ -88,7 +94,7 @@ const Login: FC<Props> = ({navigation}) => {
         email: userInfo.user.email,
         name: userInfo.user.name,
         photo: userInfo.user.photo,
-      };      
+      };
       dispatch(
         setUser({
           user: data,

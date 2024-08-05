@@ -1,10 +1,9 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {lastMessage, User} from '../../API/endpoints/mainApi';
+import { UserInterface } from '../../components/interfaces/user';
 
 interface createChatState {
   statusCode: number | undefined;
-  data: User | undefined;
-  lastMessage: lastMessage | undefined;
+  data: UserInterface | undefined;
   message: string | undefined;
   success: boolean | undefined;
 }
@@ -12,7 +11,6 @@ interface createChatState {
 const initialState: createChatState = {
   statusCode: undefined,
   data: undefined,
-  lastMessage: undefined,
   message: undefined,
   success: undefined,
 };
@@ -25,15 +23,13 @@ const createChatSlice = createSlice({
       state,
       action: PayloadAction<{
         statusCode: number | undefined;
-        data: User | undefined;
-        lastMessage: lastMessage | undefined;
+        data: UserInterface | undefined;
         message: string | undefined;
         success: boolean | undefined;
       }>,
     ) => {
       state.statusCode = action.payload.statusCode;
       state.data = action.payload.data;
-      state.lastMessage = action.payload.lastMessage;
       state.message = action.payload.message;
       state.success = action.payload.success;
     },

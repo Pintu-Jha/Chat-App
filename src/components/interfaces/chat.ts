@@ -3,13 +3,13 @@ import { UserInterface } from "./user";
 export interface ChatListItemInterface {
   admin: string;
   createdAt: string;
-  isGroupChat: boolean;
+  isGroupChat: true;
   lastMessage?: ChatMessageInterface;
   name: string;
   participants: UserInterface[];
   updatedAt: string;
   _id: string;
-}
+}[]
 
 export interface ChatMessageInterface {
   _id: string;
@@ -24,7 +24,6 @@ export interface ChatMessageInterface {
   createdAt: string;
   updatedAt: string;
 }
-
 export interface DeleteMessageResponse {
   data: {
     _id: string;

@@ -70,7 +70,7 @@ const ChatComponentColum = ({
               }}>
               {item?.sender?.username}
             </Text>
-            <Text
+            <Text 
               style={{
                 color: '#000',
                 fontSize: textScale(16),

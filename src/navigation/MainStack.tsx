@@ -9,6 +9,9 @@ export type MainRootStackParams = {
   [navigationString.GetAvailableUser]: undefined;
   [navigationString.CHAT_SCREEN]: {userId: any};
   [navigationString.Profile_Screen]: undefined;
+  [navigationString.NewGroup_Screen]: {AvailableUserData: any};
+  [navigationString.NewGroupColum_Screen]: {SelectedUser: any};
+  [navigationString.GroupChatDetailsScreen]: {GroupChatDetails: any};
 };
 const Stack = createNativeStackNavigator<MainRootStackParams>();
 
@@ -40,6 +43,21 @@ const MainStack: React.FC = () => {
         <Stack.Screen
           name={navigationString.Profile_Screen}
           component={Screen.ProfileScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.NewGroup_Screen}
+          component={Screen.NewGroup}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.NewGroupColum_Screen}
+          component={Screen.NewGroupColum}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.GroupChatDetailsScreen}
+          component={Screen.GroupChatDetails}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

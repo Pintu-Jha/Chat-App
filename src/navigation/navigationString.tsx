@@ -9,6 +9,9 @@ const navigationString = {
   SIGNUP_SCREEN:'signupScreen',
   GetAvailableUser:'getAvailableUser', 
   Profile_Screen:'profileScreen', 
+  NewGroup_Screen:'newGroupScreen',
+  NewGroupColum_Screen:'newGroupColumScreen',
+  GroupChatDetailsScreen:'groupChatDetalisScreen'
 } as const;
 
 export type NavigationString =

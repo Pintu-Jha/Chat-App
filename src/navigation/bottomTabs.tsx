@@ -23,14 +23,20 @@ const inActiveTabColor = '#000';
 const tabBarColor = '#fffefe';
 
 export type BottomTabsRootStackParams = {
-  Message: undefined;
-  Update: undefined;
-  Communities: undefined;
-  Call: undefined;
+  [navigationString.MESSAGE_SCREEN]: undefined;
+  [navigationString.UPDATE_SCREEN]: undefined;
+  [navigationString.COMMUNITIES_SCREEN]: undefined;
+  [navigationString.CALL_SCREEN]: undefined;
 };
+
 const Tab = createBottomTabNavigator<BottomTabsRootStackParams>();
 
-const tabData = [
+const tabData: {
+  name: keyof BottomTabsRootStackParams;
+  label: string;
+  icon: JSX.Element;
+  component: React.ComponentType<any>;
+}[] = [
   {
     name: navigationString.MESSAGE_SCREEN,
     label: 'Message',
@@ -57,7 +63,7 @@ const tabData = [
   },
 ];
 
-function BottomTabs() {
+const BottomTabs: FC = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>
@@ -66,61 +72,54 @@ function BottomTabs() {
             tabBarShowLabel: false,
             tabBarActiveTintColor: activeTabColor,
             tabBarInactiveTintColor: inActiveTabColor,
-
             tabBarStyle: {
               backgroundColor: tabBarColor,
               paddingBottom: 0,
               height: spacing.HEIGHT_70,
             },
-
             headerShown: false,
           }}>
-          {tabData.map((item, index) => {
-            return (
-              <Tab.Screen
-                key={`bottomTabMain_${index.toString()}`}
-                name={item.name as keyof BottomTabsRootStackParams}
-                component={item.component}
-                listeners={({navigation, route}) => ({})}
-                options={{
-                  tabBarLabel: item.label,
-                  tabBarIcon: ({focused}) => {
-                    return (
-                      <>
-                        <View
-                          style={[
-                            styles.iconContainerStyle,
-                            focused && {
-                              backgroundColor: '#0cfa0c',
-                              width: spacing.WIDTH_54,
-                              height: spacing.HEIGHT_32,
-                              borderRadius: spacing.RADIUS_16,
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              opacity: 0.3,
-                            },
-                          ]}>
-                          <Text style={styles.iconStyle}>{item.icon}</Text>
-                        </View>
-                        <Text
-                          style={[
-                            styles.label,
-                            focused && {color: '#000', fontWeight: 'bold'},
-                          ]}>
-                          {item.label}
-                        </Text>
-                      </>
-                    );
-                  },
-                }}
-              />
-            );
-          })}
+          {tabData.map((item, index) => (
+            <Tab.Screen
+              key={`bottomTabMain_${index.toString()}`}
+              name={item.name}
+              component={item.component}
+              options={{
+                tabBarLabel: item.label,
+                tabBarIcon: ({focused}) => (
+                  <>
+                    <View
+                      style={[
+                        styles.iconContainerStyle,
+                        focused && {
+                          backgroundColor: '#0cfa0c',
+                          width: spacing.WIDTH_54,
+                          height: spacing.HEIGHT_32,
+                          borderRadius: spacing.RADIUS_16,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          opacity: 0.3,
+                        },
+                      ]}>
+                      <Text style={styles.iconStyle}>{item.icon}</Text>
+                    </View>
+                    <Text
+                      style={[
+                        styles.label,
+                        focused && {color: '#000', fontWeight: 'bold'},
+                      ]}>
+                      {item.label}
+                    </Text>
+                  </>
+                ),
+              }}
+            />
+          ))}
         </Tab.Navigator>
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   iconContainerStyle: {
