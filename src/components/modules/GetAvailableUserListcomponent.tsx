@@ -1,28 +1,22 @@
-import {View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {FC, useEffect} from 'react';
-import GetAvailableUserListColums from '../columns/GetAvailableUserListColums';
+import React from 'react';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch } from 'react-redux';
 import {
   useCreateChatMutation,
   useGetAvailableUserQuery,
 } from '../../API/endpoints/mainApi';
-import navigationString from '../../navigation/navigationString';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainRootStackParams} from '../../navigation/MainStack';
-import {useDispatch} from 'react-redux';
-import {createChatData} from '../../redux/slices/createChatSlice';
-import Header from '../common/Header';
-import VirtualizedView from '../common/VirtualizedView';
-import {Image} from 'react-native-svg';
 import CommunitiesSvg from '../../asset/SVG/CommunitiesSvg';
-import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
+import navigationString from '../../navigation/navigationString';
+import { createChatData } from '../../redux/slices/createChatSlice';
+import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
+import { goBack, navigate } from '../../utills/HelperFuncation';
+import GetAvailableUserListColums from '../columns/GetAvailableUserListColums';
+import Header from '../common/Header';
 import TextComp from '../common/TextComp';
 import { UserInterface } from '../interfaces/user';
 
-type Props = NativeStackScreenProps<
-  MainRootStackParams,
-  typeof navigationString.GetAvailableUser
->;
-const GetAvailableUserListcomponent: FC<Props> = ({navigation}) => {
+
+const GetAvailableUserListcomponent = ({}) => {
   const dispatch = useDispatch();
   const {
     data: usersAvailable,
@@ -45,7 +39,7 @@ const GetAvailableUserListcomponent: FC<Props> = ({navigation}) => {
           success: success,
         }),
       );
-      navigation.navigate(navigationString.CHAT_SCREEN, {userId: data});
+      navigate(navigationString.CHAT_SCREEN, {userId: data});
     } catch (error) {
       console.log(error);
     }
@@ -55,14 +49,12 @@ const GetAvailableUserListcomponent: FC<Props> = ({navigation}) => {
       <Header
         isRightHeaderContainer={true}
         isRightHeaderContainerImageWant={false}
-        leftArrowNavigation={() => navigation.goBack()}
+        leftArrowNavigation={() => goBack()}
       />
       <TouchableOpacity
         style={styles.newGroupBtnContainer}
         onPress={() =>
-          navigation.navigate(navigationString.NewGroup_Screen, {
-            AvailableUserData: usersAvailable?.data, 
-          })
+          navigate(navigationString.NewGroup_Screen)
         }>
         <View style={styles.newGroupBtn}>
           <CommunitiesSvg />

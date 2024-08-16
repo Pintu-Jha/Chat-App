@@ -1,24 +1,19 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {FC, useEffect, useRef, useState} from 'react';
-import CommonFlotingBotton from '../../../components/common/CommonFlotingBotton';
-import {MainRootStackParams} from '../../../navigation/MainStack';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import navigationString from '../../../navigation/navigationString';
-import UsersChatListComponent from '../../../components/modules/UsersChatListComponent';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
 import AddSvg from '../../../asset/SVG/AddSvg';
+import CommonFlotingBotton from '../../../components/common/CommonFlotingBotton';
+import UsersChatListComponent from '../../../components/modules/UsersChatListComponent';
+import navigationString from '../../../navigation/navigationString';
+import {navigate} from '../../../utills/HelperFuncation';
 
-type Props = NativeStackScreenProps<
-  MainRootStackParams,
-  typeof navigationString.GetAvailableUser
->;
-const Message: FC<Props> = ({navigation, route}) => {
+const Message = () => {
   return (
     <View style={{flex: 1}}>
       <CommonFlotingBotton
-        onPress={() => navigation.navigate(navigationString.GetAvailableUser)}
+        onPress={() => navigate(navigationString.GetAvailableUser)}
         Icon={<AddSvg />}
       />
-      <UsersChatListComponent navigation={navigation} route={route} />
+      <UsersChatListComponent />
     </View>
   );
 };

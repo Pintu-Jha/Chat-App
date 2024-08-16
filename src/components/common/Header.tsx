@@ -34,10 +34,10 @@ interface HeaderContainerProps {
   onPressThirdIcon?: () => void;
   isRightHeaderContainerImageWant?: boolean;
   typing?: boolean;
-  getChatDetails?:()=> void
+  getChatDetails?: () => void;
 }
 
-const Header: FC<HeaderContainerProps> = ({
+const Header = ({
   text = '',
   style,
   onPressMeanu,
@@ -56,8 +56,8 @@ const Header: FC<HeaderContainerProps> = ({
   onPressThirdIcon,
   isRightHeaderContainerImageWant = true,
   typing = false,
-  getChatDetails
-}) => {
+  getChatDetails,
+}: HeaderContainerProps) => {
   return (
     <View style={styles.headerContainer}>
       {isRightHeaderContainer ? (
@@ -87,9 +87,9 @@ const Header: FC<HeaderContainerProps> = ({
               justifyContent: 'space-around',
               marginLeft: moderateScale(7),
             }}>
-           <TouchableOpacity onPress={getChatDetails} activeOpacity={1}>
-           <TextComp text={userNameText} style={styles.userNameTextStyle} />
-           </TouchableOpacity>
+            <TouchableOpacity onPress={getChatDetails} activeOpacity={1}>
+              <TextComp text={userNameText} style={styles.userNameTextStyle} />
+            </TouchableOpacity>
             {typing ? (
               <TextComp text="typing..." style={styles.typingStyle} />
             ) : null}

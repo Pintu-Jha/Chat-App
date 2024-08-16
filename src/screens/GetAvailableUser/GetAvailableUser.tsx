@@ -1,17 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { FC } from 'react'
 import GetAvailableUserListcomponent from '../../components/modules/GetAvailableUserListcomponent'
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainRootStackParams } from '../../navigation/MainStack';
-import navigationString from '../../navigation/navigationString';
 import VirtualizedView from '../../components/common/VirtualizedView';
 
-type Props = NativeStackScreenProps<MainRootStackParams, typeof navigationString.GetAvailableUser>;
-
-const GetAvailableUser:FC<Props> = ({navigation,route}) => { 
+const GetAvailableUser = () => { 
   return (
     <VirtualizedView>
-     <GetAvailableUserListcomponent navigation={navigation} route={route}/>
+     <GetAvailableUserListcomponent  />
     </VirtualizedView>
   )
 }

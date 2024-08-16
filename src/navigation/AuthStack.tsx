@@ -3,13 +3,9 @@ import * as Screens from '../screens';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import navigationString from './navigationString';
 
-export type AuthStackParams = {
-  [navigationString.LOGIN_SCREEN]: undefined;
-  [navigationString.SIGNUP_SCREEN]: undefined;
-};
-const Stack = createNativeStackNavigator<AuthStackParams>();
+const Stack = createNativeStackNavigator();
 
-const AuthStack:FC = () => {
+const AuthStack = () => {
   return (
     <>
       <Stack.Navigator

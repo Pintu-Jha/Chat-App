@@ -1,39 +1,31 @@
-import {FlatList, RefreshControl, StyleSheet, Text, View} from 'react-native';
-import React, {FC, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {FlatList, RefreshControl, StyleSheet, View} from 'react-native';
+import {useSelector} from 'react-redux';
 import {
   useCreateChatMutation,
   useDeleteChatMutation,
   useDeleteGroupChatMutation,
-  useGetAllMessageQuery,
   useGetUsersChatListQuery,
 } from '../../API/endpoints/mainApi';
-import UsersChatListComponentsColums from '../columns/UsersChatListComponentsColums';
-import navigationString from '../../navigation/navigationString';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainRootStackParams} from '../../navigation/MainStack';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../redux/store';
-import Header from '../common/Header';
 import CameraSvg from '../../asset/SVG/CameraSvg';
-import QrCodeSvg from '../../asset/SVG/QrCodeSvg';
 import DeleteSvg from '../../asset/SVG/DeleteSvg';
-import {showSucess} from '../../utills/HelperFuncation';
-import TextComp from '../common/TextComp';
+import QrCodeSvg from '../../asset/SVG/QrCodeSvg';
+import navigationString from '../../navigation/navigationString';
+import {RootState} from '../../redux/store';
 import {
   moderateScale,
   scale,
   textScale,
   verticalScale,
 } from '../../styles/responsiveStyles';
-import {ChatListItemInterface} from '../interfaces/chat';
+import {navigate, showSucess} from '../../utills/HelperFuncation';
+import UsersChatListComponentsColums from '../columns/UsersChatListComponentsColums';
+import Header from '../common/Header';
 import LoadingScreen from '../common/Loader';
+import TextComp from '../common/TextComp';
+import {ChatListItemInterface} from '../interfaces/chat';
 
-type Props = NativeStackScreenProps<
-  MainRootStackParams,
-  typeof navigationString.GetAvailableUser
->;
-
-const UsersChatListComponent: FC<Props> = ({navigation}) => {
+const UsersChatListComponent = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [firstSelectionDone, setFirstSelectionDone] = useState<boolean>(false);
@@ -75,13 +67,12 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
       item?.participants[0]?._id === loggedUser?.user?._id
         ? item?.participants[1]
         : item?.participants[0];
-
     try {
       if (item.isGroupChat) {
-        navigation.navigate(navigationString.CHAT_SCREEN, {userId: item});
+        navigate(navigationString.CHAT_SCREEN, {userId: item});
       } else {
         const {data} = await createChat({receiverId: senderInfo?._id}).unwrap();
-        navigation.navigate(navigationString.CHAT_SCREEN, {userId: data});
+        navigate(navigationString.CHAT_SCREEN, {userId: data});
       }
     } catch (error) {
       console.log(error);
@@ -133,7 +124,7 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
     }
   }
   return (
-    <View>
+    <View style={{flex: 1}}>
       {selectedItemId ? (
         <Header
           isForthIcon={true}
@@ -154,47 +145,49 @@ const UsersChatListComponent: FC<Props> = ({navigation}) => {
           secondIcon={<QrCodeSvg />}
         />
       )}
-      <FlatList
-        data={chats}
-        keyExtractor={(item, index) => String(item._id)}
-        renderItem={({item, index}) => {
-          return (
-            <>
-              {userChatListLoding ? (
-                <LoadingScreen />
-              ) : (
-                <UsersChatListComponentsColums
-                  item={item}
-                  index={index}
-                  key={'GetUserChatListColums' + index}
-                  refetchData={refetchData}
-                  isError={userChatListError}
-                  onPressProgram={onPressProgram}
-                  isSelected={item._id === selectedItemId}
-                  onLongPressStart={() =>
-                    handleLongPressStart(item._id, item.isGroupChat)
-                  }
-                  onLongPressEnd={handleLongPressEnd}
-                  unreadCount={
-                    UnreadeMessageCount?.filter(n => n.chat === item?._id)
-                      .length
-                  }
-                />
-              )}
-            </>
-          );
-        }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
+      <View style={{marginBottom: moderateScale(50)}}>
+        <FlatList
+          data={chats}
+          keyExtractor={(item, index) => String(item._id)}
+          renderItem={({item, index}) => {
+            return (
+              <>
+                {userChatListLoding ? (
+                  <LoadingScreen />
+                ) : (
+                  <UsersChatListComponentsColums
+                    item={item}
+                    index={index}
+                    key={'GetUserChatListColums' + index}
+                    refetchData={refetchData}
+                    isError={userChatListError}
+                    onPressProgram={onPressProgram}
+                    isSelected={item._id === selectedItemId}
+                    onLongPressStart={() =>
+                      handleLongPressStart(item._id, item.isGroupChat)
+                    }
+                    onLongPressEnd={handleLongPressEnd}
+                    unreadCount={
+                      UnreadeMessageCount?.filter(n => n.chat === item?._id)
+                        .length
+                    }
+                  />
+                )}
+              </>
+            );
+          }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      </View>
       {isToggalMenuBotton ? (
         <View style={styles.menuToggalBotton}>
           <TextComp
             text="Profile"
             style={{fontSize: textScale(20)}}
             onPress={() => {
-              navigation.navigate(navigationString.Profile_Screen),
+              navigate(navigationString.Profile_Screen),
                 setIsToggalMenuBotton(false);
             }}
           />

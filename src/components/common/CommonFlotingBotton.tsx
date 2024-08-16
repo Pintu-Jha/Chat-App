@@ -14,11 +14,11 @@ interface CommonFlotingBottonProps {
   Icon?: any;
 }
 
-const CommonFlotingBotton: FC<CommonFlotingBottonProps> = ({
+const CommonFlotingBotton = ({
   onPress,
   activeOpacity = 0.8,
   Icon,
-}) => {
+}:CommonFlotingBottonProps) => {
   return (
     <TouchableOpacity
       style={styles.bottonContainer}

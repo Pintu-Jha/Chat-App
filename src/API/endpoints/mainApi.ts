@@ -12,6 +12,7 @@ import {
   Get_Available_User,
   Get_User_Chat_List,
   Group_Chat_Details,
+  Remove_GroupChat_Participent,
   Send_Message,
 } from '../../config/url';
 import {baseApi} from '../apiSlice';
@@ -96,6 +97,24 @@ export const mainApi = baseApi.injectEndpoints({
         url: `${Group_Chat_Details}/${roomId}`,
       }),
     }),
+    RemoveGroupChatParticipent: builder.mutation<
+      APISuccessResponseInterface,
+      {roomId: any; participentId: any}
+    >({
+      query: ({roomId, participentId}) => ({
+        url: `${Remove_GroupChat_Participent}/${roomId}/${participentId}`,
+        method: 'DELETE',
+      }),
+    }),
+    AddGroupChatParticipent: builder.mutation<
+      APISuccessResponseInterface,
+      {roomId: any; participentId: any}
+    >({
+      query: ({roomId, participentId}) => ({
+        url: `${Remove_GroupChat_Participent}/${roomId}/${participentId}`,
+        method: 'POST',
+      }),
+    }),
   }),
   overrideExisting: true,
 });
@@ -111,4 +130,6 @@ export const {
   useDeleteChatMutation,
   useCreateGroupChatMutation,
   useGetGroupChatDetailsQuery,
+  useRemoveGroupChatParticipentMutation,
+  useAddGroupChatParticipentMutation,
 } = mainApi;

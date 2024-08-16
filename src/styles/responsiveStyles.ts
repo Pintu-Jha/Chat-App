@@ -5,11 +5,11 @@ const { width, height } = Dimensions.get('window');
 const guidelineBaseWidth = 375;
 const guidelineBaseHeight = 812;
 
-const scale = size => (width / guidelineBaseWidth) * size;
-const verticalScale = size => (height / guidelineBaseHeight) * size;
-const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
-const moderateScaleVertical = (size, factor = 0.5) => size + (verticalScale(size) - size) * factor;
-const textScale = percent => { return RFValue(percent, guidelineBaseHeight) };
+const scale = (size: number) => (width / guidelineBaseWidth) * size;
+const verticalScale = (size: number) => (height / guidelineBaseHeight) * size;
+const moderateScale = (size: number, factor = 0.5) => size + (scale(size) - size) * factor;
+const moderateScaleVertical = (size: number, factor = 0.5) => size + (verticalScale(size) - size) * factor;
+const textScale = (percent: number) => { return RFValue(percent, guidelineBaseHeight) };
 // const textScale = percent => {
 // 	const screenHeight = Dimensions.get('window').height;
 // 	//calculate absolute ratio for bigger screens 18.5:9 requiring smaller scaling

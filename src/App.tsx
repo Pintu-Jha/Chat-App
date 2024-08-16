@@ -13,8 +13,7 @@ import {SocketProvider} from './context/SocketContext';
 const {dispatch} = store;
 
 GoogleSignin.configure({
-  webClientId:
-    '11593219429-69ju69imhbpq43g73t01lfmr27pekifg.apps.googleusercontent.com',
+  webClientId: process.env.GOOGLE_WEB_CLIENT_ID,
   offlineAccess: false,
 });
 const App = () => {

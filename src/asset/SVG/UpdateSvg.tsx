@@ -1,5 +1,5 @@
 import * as React from "react"
-import Svg, { SvgProps, Path } from "react-native-svg"
+import Svg, { Path, SvgProps } from "react-native-svg"
 /* SVGR has dropped some elements not supported by react-native-svg: title */
 const UpdateSvg = ({width = 25, height = 25, ...props}: SvgProps) => (
   <Svg

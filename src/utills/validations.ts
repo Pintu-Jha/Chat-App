@@ -1,7 +1,7 @@
 import validator from 'is_js';
 
 
-const checkEmpty = (val, key) => {
+function checkEmpty(val: string, key: string) {
     if (validator.empty(val.trim())) {
         return `Please enter ${key}`
     } else {
@@ -9,7 +9,7 @@ const checkEmpty = (val, key) => {
     }
 }
 
-const checkMinLength = (val, minLength, key) => {
+const checkMinLength = (val: { trim: () => { (): any; new(): any; length: number; }; }, minLength: number, key: string) => {
     if (val.trim().length < minLength) {
         return `Please enter valid ${key}`
     } else {
@@ -17,7 +17,7 @@ const checkMinLength = (val, minLength, key) => {
     }
 }
 
-export default function (data) {
+export default function (data: { fullName: any; username: any; email: any; password: any; otp: any; }) {
     const { 
         fullName,
         username,

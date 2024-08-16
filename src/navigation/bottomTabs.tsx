@@ -1,42 +1,27 @@
-import React, {FC, useRef} from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react';
 import {
-  Animated,
-  Dimensions,
-  Image,
   SafeAreaView,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native';
-import {spacing} from '../styles/spacing';
-import * as Screen from '../screens/index';
-import navigationString from './navigationString';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {textScale} from '../styles/responsiveStyles';
-import ChatSvg from '../asset/SVG/ChatSvg';
-import UpdateSvg from '../asset/SVG/UpdateSvg';
-import CommunitiesSvg from '../asset/SVG/CommunitiesSvg';
 import CallSvg from '../asset/SVG/CallSvg';
+import ChatSvg from '../asset/SVG/ChatSvg';
+import CommunitiesSvg from '../asset/SVG/CommunitiesSvg';
+import UpdateSvg from '../asset/SVG/UpdateSvg';
+import * as Screen from '../screens/index';
+import { textScale } from '../styles/responsiveStyles';
+import { spacing } from '../styles/spacing';
+import navigationString from './navigationString';
 
 const activeTabColor = '#000';
 const inActiveTabColor = '#000';
 const tabBarColor = '#fffefe';
 
-export type BottomTabsRootStackParams = {
-  [navigationString.MESSAGE_SCREEN]: undefined;
-  [navigationString.UPDATE_SCREEN]: undefined;
-  [navigationString.COMMUNITIES_SCREEN]: undefined;
-  [navigationString.CALL_SCREEN]: undefined;
-};
+const Tab = createBottomTabNavigator();
 
-const Tab = createBottomTabNavigator<BottomTabsRootStackParams>();
-
-const tabData: {
-  name: keyof BottomTabsRootStackParams;
-  label: string;
-  icon: JSX.Element;
-  component: React.ComponentType<any>;
-}[] = [
+const tabData = [
   {
     name: navigationString.MESSAGE_SCREEN,
     label: 'Message',
@@ -63,7 +48,7 @@ const tabData: {
   },
 ];
 
-const BottomTabs: FC = () => {
+const BottomTabs = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{flex: 1}}>

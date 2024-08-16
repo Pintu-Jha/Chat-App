@@ -1,27 +1,25 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {FC, useState} from 'react';
-import Header from '../../components/common/Header';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainRootStackParams} from '../../navigation/MainStack';
-import {
-  moderateScale,
-  scale,
-  textScale,
-  width,
-} from '../../styles/responsiveStyles';
-import TextComp from '../../components/common/TextComp';
+import axios from 'axios';
+import React from 'react';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { useUpdateUserAvatarMutation } from '../../API/endpoints/authApi';
 import BottonComp from '../../components/common/BottonComp';
-import {useUpdateUserAvatarMutation} from '../../API/endpoints/authApi';
-import {pickDocument} from '../../utills/commonImagePicker';
-import {useDispatch, useSelector} from 'react-redux';
-import {logout} from '../../redux/slices/authSlice';
-import {RootState} from '../../redux/store';
-import {localIPAddress} from '../../config/url';
-import {clearAsyncKeyData, USER_DATA} from '../../utills/CustomAsyncStorage';
+import Header from '../../components/common/Header';
+import TextComp from '../../components/common/TextComp';
+import { baseUrl, Update_Avatar } from '../../config/url';
+import { logout } from '../../redux/slices/authSlice';
+import { RootState } from '../../redux/store';
+import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
+import { pickDocument } from '../../utills/commonImagePicker';
+import {
+  clearAsyncKeyData,
+  getToken,
+  TOKEN_KEY,
+  USER_DATA,
+} from '../../utills/CustomAsyncStorage';
+import { goBack } from '../../utills/HelperFuncation';
 
-type Props = NativeStackScreenProps<MainRootStackParams, 'profileScreen'>;
-
-const Profile: FC<Props> = ({navigation}) => {
+const Profile = ({}) => {
   const dispatch = useDispatch();
   const [updateUserAvatar] = useUpdateUserAvatarMutation();
   const pickAndUploadImage = () => {
@@ -32,16 +30,21 @@ const Profile: FC<Props> = ({navigation}) => {
         type: selectedImage.type,
         name: selectedImage.name,
       });
-
       try {
-        await updateUserAvatar(formData).unwrap();
+        let token = await getToken(TOKEN_KEY);
+        const res = await axios.patch(baseUrl + Update_Avatar, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('res >', JSON.stringify(res));
       } catch (error) {
         console.error('Image upload failed:', error);
       }
     }),
       {
-        cropping: true, // Example option
-        multiple: false, // Ensure single image selection
+        cropping: true,
+        multiple: false,
       };
   };
   const handaleLogout = async () => {
@@ -55,15 +58,15 @@ const Profile: FC<Props> = ({navigation}) => {
         isRightHeaderContainer={true}
         isRightHeaderContainerImageWant={false}
         userNameText="profile"
-        leftArrowNavigation={() => navigation.goBack()}
+        leftArrowNavigation={() => goBack()}
       />
       <View style={styles.userDetailsContainer}>
         <TouchableOpacity onPress={pickAndUploadImage}>
           <Image
             source={{
-              uri:
-                profile?.avatar?.url ||
-                'https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg',
+              uri: profile?.avatar?.url
+                ? profile?.avatar?.url
+                : 'https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg',
             }}
             style={styles.DPStyle}
           />

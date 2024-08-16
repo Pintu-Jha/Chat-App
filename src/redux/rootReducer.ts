@@ -4,12 +4,15 @@ import createChatData from './slices/createChatSlice';
 import {baseApi} from '../API/apiSlice';
 import updateLastMessage from './slices/UpdateLastMessage';
 import UnreadeMessageCount from './slices/UnreadeMessageCount';
+import groupChatDetails  from './slices/groupChatDetailsSlice';
+
 
 const rootReducer = combineReducers({
   auth: authReducer,
   createChat: createChatData,
-  updateLastMessage:updateLastMessage,
-  UnreadeMessageCount:UnreadeMessageCount,
+  updateLastMessage: updateLastMessage,
+  UnreadeMessageCount: UnreadeMessageCount,
+  GroupChatDetails: groupChatDetails,
   [baseApi.reducerPath]: baseApi.reducer,
 });
 

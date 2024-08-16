@@ -7,7 +7,7 @@ import LoadingScreen from '../../components/common/Loader';
 import {UserInterface} from '../interfaces/user';
 import CheckMark from '../../asset/SVG/CheckMarkSvg';
 
-interface GetAvailableUserListColumsProps {
+type GetAvailableUserListColumsProps ={
   item: UserInterface;
   index?: any;
   onPressProgram: (item: UserInterface) => void;

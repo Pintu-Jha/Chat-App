@@ -1,21 +1,12 @@
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import navigationString from './navigationString';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as Screen from '../screens/index';
 import bottomTabs from './bottomTabs';
+import navigationString from './navigationString';
 
-export type MainRootStackParams = {
-  [navigationString.BOTTON_TAB_BAR]: undefined;
-  [navigationString.GetAvailableUser]: undefined;
-  [navigationString.CHAT_SCREEN]: {userId: any};
-  [navigationString.Profile_Screen]: undefined;
-  [navigationString.NewGroup_Screen]: {AvailableUserData: any};
-  [navigationString.NewGroupColum_Screen]: {SelectedUser: any};
-  [navigationString.GroupChatDetailsScreen]: {GroupChatDetails: any};
-};
-const Stack = createNativeStackNavigator<MainRootStackParams>();
+const Stack = createNativeStackNavigator();
 
-const MainStack: React.FC = () => {
+const MainStack = () => {
   return (
     <>
       <Stack.Navigator

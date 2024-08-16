@@ -4,7 +4,7 @@ import { Dimensions } from 'react-native';
 export const size = Dimensions.get('screen').width
 
 export function boxShadow(
-    color,
+    color: string | undefined,
     offset = { height: 6, width: 0 },
     radius = 5,
     opacity = 1,
@@ -19,7 +19,7 @@ export function boxShadow(
 }
 
 export function boxShadowLess(
-    color,
+    color: any,
     offset = { height: 6, width: 0 },
     radius = 3,
     opacity = 0.21,
@@ -49,7 +49,7 @@ export function boxShadowTwo(
     };
 }
 export function boxShadowZero(
-    color,
+    color: any,
     offset = { height: 0, width: 0 },
     radius = 0,
     opacity = 0,

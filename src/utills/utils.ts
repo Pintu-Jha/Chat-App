@@ -1,8 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-
-
 // export async function getHeaders() {
 // 	let userData = await AsyncStorage.getItem('userData');
 // 	// console.log("userData>>>",userData?.token)
@@ -22,7 +20,6 @@ import axios from 'axios';
 // 	}
 // 	return {};
 // }
-
 
 // export async function apiReq(
 // 	endPoint,
@@ -85,69 +82,77 @@ import axios from 'axios';
 // }
 
 export async function getHeaders() {
-	try {
-	  let userData = await AsyncStorage.getItem('userData');
-	  if (!!userData) {
-		return {
-		  headers: {
-			"Content-Type": "multipart/form-data", 
-			'Authorization': `${userData}`,
-		  },
-		};
-	  } else {
-		console.log('User data not found in AsyncStorage');
-		return {};
-	  }
-	} catch (error) {
-	  console.error('Error retrieving user data from AsyncStorage:', error);
-	  return {};
-	}
+  try {
+    let userData = await AsyncStorage.getItem('userData');
+    if (!!userData) {
+      return {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `${userData}`,
+        },
+      };
+    } else {
+      console.log('User data not found in AsyncStorage');
+      return {};
+    }
+  } catch (error) {
+    console.error('Error retrieving user data from AsyncStorage:', error);
+    return {};
   }
-
-export async function apiReq(endPoint, data, method, headers) {
-	try {
-		const tokenHeader = await getHeaders();
-		headers = {
-			...tokenHeader.headers,
-			...headers,
-		};
-
-		let config = {
-			method: method,
-			url: endPoint,
-		};
-	
-		if (method === 'get' || method === 'delete') {
-			config.params = data;
-		} else {
-			config.data = data;
-		}
-
-		const response = await axios(config,{headers});
-		
-		console.log('formPostResponse>>>',response);
-		return response.data;
-	} catch (error) {
-		console.log('API Request error:', error);
-		throw error;
-	}
 }
 
+export async function apiReq(
+  endPoint: any,
+  data: any,
+  method: string,
+  headers: {},
+  requestOptions?: any,
+) {
+  try {
+    const tokenHeader = await getHeaders();
+    headers = {
+      ...tokenHeader.headers,
+      ...headers,
+    };
 
+    let config: any = {
+      method: method,
+      url: endPoint,
+    };
 
-export function apiPost(endPoint, data, headers = {}) {
-	return apiReq(endPoint, data, 'post', headers);
+    if (method === 'get' || method === 'delete') {
+      config.params = data;
+    } else {
+      config.data = data;
+    }
+
+    const response = await axios(config, {headers});
+
+    console.log('formPostResponse>>>', response);
+    return response.data;
+  } catch (error) {
+    console.log('API Request error:', error);
+    throw error;
+  }
 }
 
-export function apiDelete(endPoint, data, headers = {}) {
-	return apiReq(endPoint, data, 'delete', headers);
+export function apiPost(endPoint: any, data: any, headers = {}) {
+  return apiReq(endPoint, data, 'post', headers);
 }
 
-export function apiGet(endPoint, data, headers = {}, requestOptions) {
-	return apiReq(endPoint, data, 'get', headers, requestOptions);
+export function apiDelete(endPoint: any, data: any, headers = {}) {
+  return apiReq(endPoint, data, 'delete', headers);
 }
 
-export function apiPut(endPoint, data, headers = {}) {
-	return apiReq(endPoint, data, 'put', headers);
+export function apiGet(
+  endPoint: any,
+  data: any,
+  headers = {},
+  requestOptions: any,
+) {
+  return apiReq(endPoint, data, 'get', headers, requestOptions);
 }
 
+export function apiPut(endPoint: any, data: any, headers = {}) {
+  return apiReq(endPoint, data, 'put', headers);
+}

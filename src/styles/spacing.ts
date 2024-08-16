@@ -7,7 +7,7 @@ import {
 } from './responsiveStyles';
 
 const {height, width} = Dimensions.get('window');
-const {screenHeight, screenWidth} = Dimensions.get('screen');
+const {screenHeight, screenWidth}: any = Dimensions.get('screen');
 
 export const spacing = {
   PADDING_2: moderateScale(2),
@@ -148,8 +148,8 @@ export const spacing = {
   WIDTH_46: scale(46),
   WIDTH_48: scale(48),
   WIDTH_30: scale(30),
-  WIDTH_34: scale(34),
-  WIDTH_36: scale(36),
+  // WIDTH_34: scale(34),
+  // WIDTH_36: scale(36),
   WIDTH_50: scale(50),
   WIDTH_54: scale(54),
   WIDTH_56: scale(56),
@@ -242,7 +242,6 @@ export const spacing = {
   MARGIN_18: moderateScale(18),
   MARGIN_20: moderateScale(20),
   MARGIN_22: moderateScale(22),
-  MARGIN_24: moderateScale(24),
   MARGIN_24: moderateScale(24),
   MARGIN_26: moderateScale(26),
   MARGIN_28: moderateScale(28),

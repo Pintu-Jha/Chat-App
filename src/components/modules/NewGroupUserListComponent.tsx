@@ -1,37 +1,27 @@
-import {FlatList, StyleSheet, Text, View} from 'react-native';
-import React, {FC, useState} from 'react';
-import {RouteProp, useNavigation} from '@react-navigation/native';
-import {MainRootStackParams} from '../../navigation/MainStack';
-import GetAvailableUserListColums from '../columns/GetAvailableUserListColums';
-import navigationString from '../../navigation/navigationString';
-import Header from '../common/Header';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import VirtualizedView from '../common/VirtualizedView';
-import NewGroupRow from '../rows/NewGroupRow';
-import {UserInterface} from '../interfaces/user';
-import {moderateScale, verticalScale} from '../../styles/responsiveStyles';
-import CommonFlotingBotton from '../common/CommonFlotingBotton';
+import React, { useState } from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
+import {
+  useAddGroupChatParticipentMutation,
+  useGetAvailableUserQuery,
+} from '../../API/endpoints/mainApi';
 import RightArrow from '../../asset/SVG/RightArrow';
-import {showError} from '../../utills/HelperFuncation';
+import navigationString from '../../navigation/navigationString';
+import { moderateScale, verticalScale } from '../../styles/responsiveStyles';
+import { goBack, navigate, showError } from '../../utills/HelperFuncation';
+import GetAvailableUserListColums from '../columns/GetAvailableUserListColums';
+import CommonFlotingBotton from '../common/CommonFlotingBotton';
+import Header from '../common/Header';
+import VirtualizedView from '../common/VirtualizedView';
+import { UserInterface } from '../interfaces/user';
+import NewGroupRow from '../rows/NewGroupRow';
 
-type AvailableScreenRouteProp = RouteProp<
-  MainRootStackParams,
-  typeof navigationString.NewGroup_Screen
->;
-type Props = NativeStackScreenProps<
-  MainRootStackParams,
-  typeof navigationString.NewGroup_Screen
->;
-type NewGroupScreenProps = {
-  route: AvailableScreenRouteProp;
-};
-
-const NewGroupUserListComponent: FC<NewGroupScreenProps> = ({route}) => {
-  const navigation = useNavigation<Props['navigation']>();
+const NewGroupUserListComponent= ({}) => {
+ 
   const [selectedNewGroupUser, setSelectedNewGroupUser] = useState<
     UserInterface[]
   >([]);
-  const {AvailableUserData} = route.params;
+  const {data: usersAvailable} = useGetAvailableUserQuery();
+  const [addGroupChatParticipent, {}] = useAddGroupChatParticipentMutation();
 
   const onPressProgram = (item: UserInterface) => {
     setSelectedNewGroupUser(prevSelectedUsers => {
@@ -46,9 +36,10 @@ const NewGroupUserListComponent: FC<NewGroupScreenProps> = ({route}) => {
   };
   const handlePress = () => {
     if (selectedNewGroupUser.length > 0) {
-      navigation.navigate(navigationString.NewGroupColum_Screen, {
+      navigate(navigationString.NewGroupColum_Screen, {
         SelectedUser: selectedNewGroupUser,
       });
+    } else if (false) {
     } else {
       showError('Atleast one selecte');
     }
@@ -61,7 +52,7 @@ const NewGroupUserListComponent: FC<NewGroupScreenProps> = ({route}) => {
           isRightHeaderContainer={true}
           isRightHeaderContainerImageWant={false}
           userNameText="New Group"
-          leftArrowNavigation={() => navigation.goBack()}
+          leftArrowNavigation={() => goBack()}
         />
         {selectedNewGroupUser.length > 0 ? (
           <>
@@ -82,7 +73,7 @@ const NewGroupUserListComponent: FC<NewGroupScreenProps> = ({route}) => {
           </>
         ) : null}
         <FlatList
-          data={AvailableUserData}
+          data={usersAvailable?.data}
           keyExtractor={item => item._id.toString()}
           renderItem={({item, index}) => {
             const isSelected = selectedNewGroupUser.find(

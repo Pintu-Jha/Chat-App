@@ -1,29 +1,19 @@
-import {FlatList, Image, StyleSheet, Text, TextInput, View} from 'react-native';
-import React, {FC, useState} from 'react';
-import {RouteProp, useNavigation} from '@react-navigation/native';
-import {MainRootStackParams} from '../../navigation/MainStack';
+import React, {useState} from 'react';
+import {FlatList, Image, StyleSheet, TextInput, View} from 'react-native';
+import {useCreateGroupChatMutation} from '../../API/endpoints/mainApi';
+import YesSvg from '../../asset/SVG/YesSvg';
 import navigationString from '../../navigation/navigationString';
 import {moderateScale, scale} from '../../styles/responsiveStyles';
-import Header from '../common/Header';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {goBack, navigate} from '../../utills/HelperFuncation';
 import CommonFlotingBotton from '../common/CommonFlotingBotton';
-import YesSvg from '../../asset/SVG/YesSvg';
-import {useCreateGroupChatMutation} from '../../API/endpoints/mainApi';
+import Header from '../common/Header';
 
-type AvailableScreenRouteProp = RouteProp<
-  MainRootStackParams,
-  typeof navigationString.NewGroupColum_Screen
->;
-type NewGroupScreenProps = {
-  route: AvailableScreenRouteProp;
-};
-type Props = NativeStackScreenProps<
-  MainRootStackParams,
-  typeof navigationString.NewGroup_Screen
->;
-const NewGroupColum: FC<NewGroupScreenProps> = ({route}) => {
-  const navigation = useNavigation<Props['navigation']>();
+// type paramsType = {
+//   userId: ChatListItemInterface;
+// };
+const NewGroupColum = ({route}: any) => {
   const [name, setGroupName] = useState<string>('');
+
   const {SelectedUser} = route.params;
   const [CreateGroupChat] = useCreateGroupChatMutation();
   const handalePress = async () => {
@@ -33,10 +23,10 @@ const NewGroupColum: FC<NewGroupScreenProps> = ({route}) => {
         (user: {_id: string}) => user._id,
       );
       const CreateGroupData = {name, participants: participantArray};
-      const response = await CreateGroupChat({
-        CreateGroupData:CreateGroupData
+      await CreateGroupChat({
+        CreateGroupData: CreateGroupData,
       }).unwrap();
-      navigation.navigate(navigationString.MESSAGE_SCREEN);
+      navigate(navigationString.MESSAGE_SCREEN);
     } catch (error) {
       console.error('Failed to Create group chat:', error);
     }
@@ -62,7 +52,7 @@ const NewGroupColum: FC<NewGroupScreenProps> = ({route}) => {
         isRightHeaderContainer={true}
         isRightHeaderContainerImageWant={false}
         userNameText="New Group"
-        leftArrowNavigation={() => navigation.goBack()}
+        leftArrowNavigation={() => goBack()}
       />
 
       <View style={styles.container}>

@@ -16,7 +16,7 @@ import ImagePath from '../../Utills/ImagePath';
 type TextInputContainerProps = {
   inputStyle?: any;
   textStyle?: any;
-  value?: string;
+  value: string;
   onChangeText?: (text: string) => void;
   placeholder?: String;
   secureText?: any;
@@ -26,7 +26,7 @@ type TextInputContainerProps = {
   titleIcon?: any;
 };
 
-const TextInputComp: React.FC<TextInputContainerProps & TextInputProps> = ({
+const TextInputComp = ({
   inputStyle = {},
   textStyle = {},
   value = '',
@@ -38,7 +38,7 @@ const TextInputComp: React.FC<TextInputContainerProps & TextInputProps> = ({
   isTitleIcon = false,
   titleIcon,
   ...props
-}) => {
+}: TextInputContainerProps & TextInputProps) => {
   return (
     <View style={{...styles.inputStyle, ...inputStyle}}>
       {!!isTitleIcon ? <View>{titleIcon}</View> : null}

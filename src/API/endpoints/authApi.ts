@@ -73,10 +73,9 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
     updateUserAvatar: builder.mutation<AvatarResponse, any>({
-      query: formData => ({
+      query: () => ({
         url: Update_Avatar,
         method: 'PATCH',
-        body: formData,
       }),
     }),
   }),

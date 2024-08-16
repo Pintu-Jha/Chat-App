@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  useId,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -14,14 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {RouteProp} from '@react-navigation/native';
-import {MainRootStackParams} from '../../navigation/MainStack';
-import navigationString from '../../navigation/navigationString';
-import Header from '../common/Header';
-import CallSvg from '../../asset/SVG/CallSvg';
-import VideoSvg from '../../asset/SVG/VideoSvg';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   useDeleteMessageMutation,
   useGetAllMessageQuery,
@@ -29,39 +15,32 @@ import {
   useGetUsersChatListQuery,
   useSendMessageMutation,
 } from '../../API/endpoints/mainApi';
-import {getSenderInfo} from '../../utills/InitialLoadData';
+import CallSvg from '../../asset/SVG/CallSvg';
+import DeleteSvg from '../../asset/SVG/DeleteSvg';
+import EmojiSvg from '../../asset/SVG/EmojiSvg';
+import SendSvg from '../../asset/SVG/SendSvg';
+import VideoSvg from '../../asset/SVG/VideoSvg';
+import { useSocket } from '../../context/SocketContext';
+import navigationString from '../../navigation/navigationString';
+import { groupChatDetails } from '../../redux/slices/groupChatDetailsSlice';
+import { UnreadeMessageCount } from '../../redux/slices/UnreadeMessageCount';
+import { updateLastMessage } from '../../redux/slices/UpdateLastMessage';
+import { RootState } from '../../redux/store';
+import { boxShadow } from '../../styles/Mixins';
 import {
   moderateScale,
   textScale,
   verticalScale,
 } from '../../styles/responsiveStyles';
-import {fontNames} from '../../styles/typography';
-import {boxShadow} from '../../styles/Mixins';
-import SendSvg from '../../asset/SVG/SendSvg';
-import EmojiSvg from '../../asset/SVG/EmojiSvg';
+import { fontNames } from '../../styles/typography';
+import { getSenderInfo } from '../../utills/InitialLoadData';
 import ChatComponentColum from '../columns/ChatComponentColum';
-import DeleteSvg from '../../asset/SVG/DeleteSvg';
-import {localIPAddress} from '../../config/url';
-import {useSocket} from '../../context/SocketContext';
-import {ChatListItemInterface, ChatMessageInterface} from '../interfaces/chat';
+import Header from '../common/Header';
 import LoadingScreen from '../common/Loader';
-import {updateLastMessage} from '../../redux/slices/UpdateLastMessage';
-import {UnreadeMessageCount} from '../../redux/slices/UnreadeMessageCount';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { ChatListItemInterface, ChatMessageInterface } from '../interfaces/chat';
 
-type ChatScreenRouteProp = RouteProp<
-  MainRootStackParams,
-  typeof navigationString.CHAT_SCREEN
->;
-
-type GroupChatDetailsScreenNavigationProp = NativeStackNavigationProp<
-  MainRootStackParams,
-  typeof navigationString.GroupChatDetailsScreen
->;
-
-type ChatScreenProps = {
-  route: ChatScreenRouteProp;
-  navigation: GroupChatDetailsScreenNavigationProp;
+type paramsType = {
+  userId: ChatListItemInterface;
 };
 
 const CONNECTED_EVENT = 'connect';
@@ -75,17 +54,17 @@ const LEAVE_CHAT_EVENT = 'leaveChat';
 const UPDATE_GROUP_NAME_EVENT = 'updateGroupName';
 const MESSAGE_DELETE_EVENT = 'messageDeleted';
 
-const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+const ChatComponents = ({route, navigation}: any) => {
+  const [selectedItem, setselectedItem] = useState<any>(null);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [firstSelectionDone, setFirstSelectionDone] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-  const userId = route.params;
-
-  let roomId = userId?.userId?._id;
-
+  const {params} = route;
+  const {userId} = params as paramsType;
+  let roomId = userId?._id;
   const loggedUser = useSelector((state: RootState) => state.auth);
-  const senderInfo = getSenderInfo(loggedUser, userId.userId);
+  const senderInfo = getSenderInfo(loggedUser, userId);
+
   const {
     data,
     refetch: refetchAllMessage,
@@ -95,7 +74,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
   const {
     data: GetGroupChatDetails,
     isSuccess,
-    isUninitialized,
+    refetch: refechGroupChatDetails,
   } = useGetGroupChatDetailsQuery({
     roomId,
   });
@@ -104,14 +83,14 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
   const [sendMessage] = useSendMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
 
-  const handleLongPressStart = (itemId: string) => {
+  const handleLongPressStart = (itemId: any) => {
     if (firstSelectionDone) {
-      setSelectedItemId(prevItemId => (prevItemId === itemId ? null : itemId));
+      setselectedItem(itemId);
       return;
     }
 
     const timer = setTimeout(() => {
-      setSelectedItemId(prevItemId => (prevItemId === itemId ? null : itemId));
+      setselectedItem(itemId);
       setFirstSelectionDone(true);
     }, 500);
     setPressTimer(timer);
@@ -153,7 +132,6 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
         ...chats.slice(0, chatIndex),
         ...chats.slice(chatIndex + 1),
       ];
-
       setChats(updatedChats);
       dispatch(
         updateLastMessage({
@@ -169,24 +147,24 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
     message: ChatMessageInterface,
   ) => {
     const chatToUpdate = chats.find(chat => chat._id === chatToUpdateId)!;
+
     if (chatToUpdate.lastMessage?._id === message._id) {
       refetchAllMessage();
-
-      // chatToUpdate.lastMessage = data[0];
+      chatToUpdate.lastMessage = data?.data[0];
       setChats([...chats]);
+      console.log((chatToUpdate.lastMessage = data?.data[0]));
     }
   };
 
-  const getChats = async () => {
+  const getChats = () => {
     setChats(userChatListData?.data || []);
   };
-  const onConnect = useCallback(() => {
+  const onConnect = () => {
     setIsConnected(true);
-  }, []);
-
-  const onDisconnect = useCallback(() => {
+  };
+  const onDisconnect = () => {
     setIsConnected(false);
-  }, []);
+  };
 
   const onMessageReceived = (message: ChatMessageInterface) => {
     if (message?.chat !== roomId) {
@@ -229,13 +207,10 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
     }
   };
 
-  const handleOnSocketTyping = useCallback(
-    (chatId: string) => {
-      if (chatId !== roomId) return;
-      setIsTyping(true);
-    },
-    [roomId],
-  );
+  const handleOnSocketTyping = (chatId: string) => {
+    if (chatId !== roomId) return;
+    setIsTyping(true);
+  };
 
   const handleOnSocketStopTyping = useCallback(
     (chatId: string) => {
@@ -273,19 +248,19 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
     [handleTyping],
   );
 
-  const deleteChatMessage = useCallback(
-    async (selectedItemId: string) => {
-      try {
-        const {data} = await deleteMessage({roomId, selectedItemId}).unwrap();
-        setSelectedItemId(null);
-        setMessages(prev => prev.filter(msg => msg._id !== data._id));
-        // updateChatLastMessageOnDeletion(message.chat, message);
-      } catch (error) {
-        console.error('Failed to delete message:', error);
-      }
-    },
-    [roomId, deleteMessage],
-  );
+  const deleteChatMessage = async (message: ChatMessageInterface) => {
+    try {
+      const {data} = await deleteMessage({
+        roomId,
+        selectedItemId: message?._id,
+      }).unwrap();
+      setselectedItem(null);
+      setMessages(prev => prev.filter(msg => msg._id !== data._id));
+      updateChatLastMessageOnDeletion(message.chat, message);
+    } catch (error) {
+      console.error('Failed to delete message:', error);
+    }
+  };
 
   const onMessageDelete = useCallback(
     (message: ChatMessageInterface) => {
@@ -320,11 +295,15 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
     ]);
   };
   const getChatDetails = () => {
-    {
-      isSuccess &&
-        navigation.navigate(navigationString.GroupChatDetailsScreen, {
-          GroupChatDetails: GetGroupChatDetails?.data,
-        });
+    if (isSuccess) {
+      refechGroupChatDetails();
+      navigation.navigate(navigationString.GroupChatDetailsScreen);
+      dispatch(
+        groupChatDetails({
+          data: GetGroupChatDetails?.data,
+          message: GetGroupChatDetails?.message || '',
+        }),
+      );
     }
   };
   useEffect(() => {
@@ -360,26 +339,19 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
       socket.off(LEAVE_CHAT_EVENT, onChatLeave);
       socket.off(UPDATE_GROUP_NAME_EVENT, onGroupNameChange);
     };
-  }, [
-    socket,
-    roomId,
-    onConnect,
-    onDisconnect,
-    onMessageReceived,
-    handleOnSocketTyping,
-    handleOnSocketStopTyping,
-    onMessageDelete,
-  ]);
-  const renderItem = ({item, index}: any) => (
-    <ChatComponentColum
-      item={item}
-      index={index}
-      key={'GetChatListColums' + item._id}
-      isSelected={item._id === selectedItemId}
-      onLongPressStart={() => handleLongPressStart(item._id)}
-      onLongPressEnd={handleLongPressEnd}
-    />
-  );
+  }, [socket, chats]);
+  const renderItem = ({item, index}: any) => {
+    return (
+      <ChatComponentColum
+        item={item}
+        index={index}
+        key={'GetChatListColums' + item._id}
+        isSelected={item._id === selectedItem?._id}
+        onLongPressStart={() => handleLongPressStart(item)}
+        onLongPressEnd={handleLongPressEnd}
+      />
+    );
+  };
 
   const keyExtractor = useCallback(
     (item: {_id: {toString: () => any}}) => item._id.toString(),
@@ -387,21 +359,21 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
   );
   return (
     <View style={{flex: 1, backgroundColor: '#ece5dd'}}>
-      {selectedItemId ? (
+      {selectedItem ? (
         <Header
           isForthIcon={true}
           isRightHeaderContainer={false}
           isThirdIcon={true}
           thirdIcon={<DeleteSvg />}
-          onPressThirdIcon={() => deleteChatMessage(selectedItemId)}
+          onPressThirdIcon={() => deleteChatMessage(selectedItem)}
         />
       ) : (
         <Header
           isForthIcon={true}
           isRightHeaderContainer={true}
-          userDp={senderInfo?.avatar?.url.replace('localhost', localIPAddress)}
+          userDp={senderInfo?.avatar?.url}
           userNameText={
-            userId.userId.isGroupChat ? userId.userId.name : senderInfo.username
+            userId?.isGroupChat ? userId?.name : senderInfo.username
           }
           typing={isTyping}
           isThirdIcon={true}
@@ -449,7 +421,7 @@ const ChatComponents: FC<ChatScreenProps> = ({route, navigation}) => {
   );
 };
 
-export default React.memo(ChatComponents);
+export default ChatComponents;
 
 const styles = StyleSheet.create({
   textInputContainer: {

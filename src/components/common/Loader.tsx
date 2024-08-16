@@ -4,7 +4,7 @@ import React from 'react';
 interface LoadingScreenProps {
   color?: string
 }
-const LoadingScreen: React.FC<LoadingScreenProps> = ({color='#000'}) => {
+const LoadingScreen = ({color='#000'}:LoadingScreenProps) => {
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
       <ActivityIndicator size={'large'} color={color}/>

@@ -1,14 +1,13 @@
+import React from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native';
-import React, {FC} from 'react';
-import {useSelector} from 'react-redux';
-import {RootState} from '../../redux/store';
-import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
 import {
   formatTimestamp,
   getColorForParticipant,

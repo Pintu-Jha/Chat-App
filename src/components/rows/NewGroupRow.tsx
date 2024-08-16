@@ -3,12 +3,12 @@ import React, {FC} from 'react';
 import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
 import TextComp from '../common/TextComp';
 
-interface NewGroupDatarowsProps {
+type NewGroupDatarowsProps = {
   item: any;
   index?: number;
-}
+};
 
-const NewGroupRow: FC<NewGroupDatarowsProps> = ({item, index}) => {
+const NewGroupRow = ({item, index}: NewGroupDatarowsProps) => {
   return (
     <View
       style={{
