@@ -3,10 +3,11 @@ import React, { FC } from 'react'
 import GetAvailableUserListcomponent from '../../components/modules/GetAvailableUserListcomponent'
 import VirtualizedView from '../../components/common/VirtualizedView';
 
-const GetAvailableUser = () => { 
+const GetAvailableUser = ({route}:any) => { 
+  const {params} = route;
   return (
     <VirtualizedView>
-     <GetAvailableUserListcomponent  />
+     <GetAvailableUserListcomponent  route={params}/>
     </VirtualizedView>
   )
 }

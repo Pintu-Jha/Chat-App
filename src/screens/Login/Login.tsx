@@ -48,6 +48,9 @@ const Login = () => {
     const error = validator({
       username,
       password,
+      fullName: undefined,
+      email: undefined,
+      otp: undefined
     });
     if (error) {
       showError(error);
@@ -150,7 +153,6 @@ const Login = () => {
                 secureTextEntry={secureText}
                 secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
                 onPressSecure={() => setSecureText(!secureText)}
-                keyboardType="default"
                 isTitleIcon={true}
                 titleIcon={<PasswordSvg />}
               />

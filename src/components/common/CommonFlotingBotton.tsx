@@ -1,4 +1,10 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {FC} from 'react';
 import {spacing} from '../../styles/spacing';
 import AddSvg from '../../asset/SVG/AddSvg';
@@ -12,19 +18,21 @@ interface CommonFlotingBottonProps {
   onPress?: () => void;
   activeOpacity?: number;
   Icon?: any;
+  isLoading?: boolean;
 }
 
 const CommonFlotingBotton = ({
   onPress,
   activeOpacity = 0.8,
   Icon,
-}:CommonFlotingBottonProps) => {
+  isLoading = false,
+}: CommonFlotingBottonProps) => {
   return (
     <TouchableOpacity
       style={styles.bottonContainer}
       activeOpacity={activeOpacity}
       onPress={onPress}>
-      {Icon}
+      {isLoading ? <ActivityIndicator size={'large'} color={'#fff'} /> : Icon}
     </TouchableOpacity>
   );
 };

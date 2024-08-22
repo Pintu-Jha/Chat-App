@@ -9,10 +9,6 @@ import {navigate} from '../../../utills/HelperFuncation';
 const Message = () => {
   return (
     <View style={{flex: 1}}>
-      <CommonFlotingBotton
-        onPress={() => navigate(navigationString.GetAvailableUser)}
-        Icon={<AddSvg />}
-      />
       <UsersChatListComponent />
     </View>
   );

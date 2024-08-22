@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   useDeleteMessageMutation,
   useGetAllMessageQuery,
-  useGetGroupChatDetailsQuery,
   useGetUsersChatListQuery,
   useSendMessageMutation,
 } from '../../API/endpoints/mainApi';
@@ -20,24 +19,23 @@ import DeleteSvg from '../../asset/SVG/DeleteSvg';
 import EmojiSvg from '../../asset/SVG/EmojiSvg';
 import SendSvg from '../../asset/SVG/SendSvg';
 import VideoSvg from '../../asset/SVG/VideoSvg';
-import { useSocket } from '../../context/SocketContext';
+import {useSocket} from '../../context/SocketContext';
 import navigationString from '../../navigation/navigationString';
-import { groupChatDetails } from '../../redux/slices/groupChatDetailsSlice';
-import { UnreadeMessageCount } from '../../redux/slices/UnreadeMessageCount';
-import { updateLastMessage } from '../../redux/slices/UpdateLastMessage';
-import { RootState } from '../../redux/store';
-import { boxShadow } from '../../styles/Mixins';
+import {UnreadeMessageCount} from '../../redux/slices/UnreadeMessageCount';
+import {updateLastMessage} from '../../redux/slices/UpdateLastMessage';
+import {RootState} from '../../redux/store';
+import {boxShadow} from '../../styles/Mixins';
 import {
   moderateScale,
   textScale,
   verticalScale,
 } from '../../styles/responsiveStyles';
-import { fontNames } from '../../styles/typography';
-import { getSenderInfo } from '../../utills/InitialLoadData';
+import {fontNames} from '../../styles/typography';
+import {getSenderInfo} from '../../utills/InitialLoadData';
 import ChatComponentColum from '../columns/ChatComponentColum';
 import Header from '../common/Header';
 import LoadingScreen from '../common/Loader';
-import { ChatListItemInterface, ChatMessageInterface } from '../interfaces/chat';
+import {ChatListItemInterface, ChatMessageInterface} from '../interfaces/chat';
 
 type paramsType = {
   userId: ChatListItemInterface;
@@ -71,13 +69,6 @@ const ChatComponents = ({route, navigation}: any) => {
     isLoading: isAllMessageLoading,
   } = useGetAllMessageQuery({roomId});
 
-  const {
-    data: GetGroupChatDetails,
-    isSuccess,
-    refetch: refechGroupChatDetails,
-  } = useGetGroupChatDetailsQuery({
-    roomId,
-  });
   const {data: userChatListData} = useGetUsersChatListQuery();
 
   const [sendMessage] = useSendMessageMutation();
@@ -139,7 +130,7 @@ const ChatComponents = ({route, navigation}: any) => {
         }),
       );
     } else {
-      console.error('Chat to update not found');
+      console.log('Chat to update not found');
     }
   };
   const updateChatLastMessageOnDeletion = (
@@ -159,13 +150,6 @@ const ChatComponents = ({route, navigation}: any) => {
   const getChats = () => {
     setChats(userChatListData?.data || []);
   };
-  const onConnect = () => {
-    setIsConnected(true);
-  };
-  const onDisconnect = () => {
-    setIsConnected(false);
-  };
-
   const onMessageReceived = (message: ChatMessageInterface) => {
     if (message?.chat !== roomId) {
       setUnreadMessages(prev => {
@@ -176,31 +160,23 @@ const ChatComponents = ({route, navigation}: any) => {
     } else {
       setMessages(prev => [message, ...prev]);
     }
-
     updateChatLastMessage(message.chat || '', message);
   };
 
-  const getMessages = () => {
+  const getMessages = async () => {
     if (!roomId) return Alert.alert('No chat is selected');
     setUnreadMessages(unreadMessages.filter(msg => msg.chat !== roomId));
     dispatch(UnreadeMessageCount({UnreadeMessageCount: unreadMessages}));
-    try {
-      setMessages(data?.data || []);
-    } catch (error) {
-      console.error('Failed to fetch messages:', error);
-    }
+    setMessages(data?.data || []);
   };
   const sendChatMessage = async () => {
     if (!roomId || !socket) return;
     socket.emit(STOP_TYPING_EVENT, roomId);
-
     try {
       if (message === '') return;
-      const response = await sendMessage({roomId, content: message}).unwrap();
       setMessage('');
-      const newMessage = response.data;
-      setMessages(prev => [newMessage, ...prev]);
-      refetchAllMessage();
+      const response = await sendMessage({roomId, content: message}).unwrap();
+      setMessages(prev => [response.data, ...prev]);
       updateChatLastMessage(roomId || '', response?.data);
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -232,7 +208,7 @@ const ChatComponents = ({route, navigation}: any) => {
       clearTimeout(typingTimeoutRef.current);
     }
 
-    const timerLength = 2000;
+    const timerLength = 1000;
 
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit(STOP_TYPING_EVENT, roomId);
@@ -240,14 +216,10 @@ const ChatComponents = ({route, navigation}: any) => {
     }, timerLength);
   }, [roomId, selfTyping, socket]);
 
-  const handleOnMessageChange = useCallback(
-    (text: string) => {
-      setMessage(text);
-      handleTyping();
-    },
-    [handleTyping],
-  );
-
+  const handleOnMessageChange = (text: string) => {
+    setMessage(text);
+    handleTyping();
+  };
   const deleteChatMessage = async (message: ChatMessageInterface) => {
     try {
       const {data} = await deleteMessage({
@@ -262,48 +234,18 @@ const ChatComponents = ({route, navigation}: any) => {
     }
   };
 
-  const onMessageDelete = useCallback(
-    (message: ChatMessageInterface) => {
-      if (message?.chat !== roomId) {
-        setUnreadMessages(prev => prev.filter(msg => msg._id !== message._id));
-        dispatch(UnreadeMessageCount({UnreadeMessageCount: unreadMessages}));
-        console.log('del', unreadMessages);
-      } else {
-        setMessages(prev => prev.filter(msg => msg._id !== message._id));
-      }
-      updateChatLastMessageOnDeletion(message.chat, message);
-    },
-    [roomId],
-  );
-
-  const onNewChat = (chat: ChatListItemInterface) => {
-    setChats(prev => [chat, ...prev]);
-  };
-
-  const onChatLeave = (chat: ChatListItemInterface) => {
-    setChats(prev => prev.filter(c => c._id !== chat._id));
-  };
-
-  const onGroupNameChange = (chat: ChatListItemInterface) => {
-    setChats(prev => [
-      ...prev.map(c => {
-        if (c._id === chat._id) {
-          return chat;
-        }
-        return c;
-      }),
-    ]);
+  const onMessageDelete = (message: ChatMessageInterface) => {
+    if (message?.chat !== roomId) {
+      setUnreadMessages(prev => prev.filter(msg => msg._id !== message._id));
+      dispatch(UnreadeMessageCount({UnreadeMessageCount: unreadMessages}));
+    } else {
+      setMessages(prev => prev.filter(msg => msg._id !== message._id));
+    }
+    updateChatLastMessageOnDeletion(message.chat, message);
   };
   const getChatDetails = () => {
-    if (isSuccess) {
-      refechGroupChatDetails();
-      navigation.navigate(navigationString.GroupChatDetailsScreen);
-      dispatch(
-        groupChatDetails({
-          data: GetGroupChatDetails?.data,
-          message: GetGroupChatDetails?.message || '',
-        }),
-      );
+    if (userId?.isGroupChat) {
+      navigation.navigate(navigationString.GroupChatDetailsScreen, {roomId});
     }
   };
   useEffect(() => {
@@ -311,35 +253,24 @@ const ChatComponents = ({route, navigation}: any) => {
     if (roomId) {
       getMessages();
     }
-  }, []);
+  }, [data?.data]);
 
   useEffect(() => {
     if (!socket || !roomId) return;
-
     socket.emit(JOIN_CHAT_EVENT, roomId);
-
-    socket.on(CONNECTED_EVENT, onConnect);
-    socket.on(DISCONNECT_EVENT, onDisconnect);
     socket.on(MESSAGE_RECEIVED_EVENT, onMessageReceived);
     socket.on(TYPING_EVENT, handleOnSocketTyping);
     socket.on(STOP_TYPING_EVENT, handleOnSocketStopTyping);
     socket.on(MESSAGE_DELETE_EVENT, onMessageDelete);
-    socket.on(NEW_CHAT_EVENT, onNewChat);
-    socket.on(LEAVE_CHAT_EVENT, onChatLeave);
-    socket.on(UPDATE_GROUP_NAME_EVENT, onGroupNameChange);
 
     return () => {
-      socket.off(CONNECTED_EVENT, onConnect);
-      socket.off(DISCONNECT_EVENT, onDisconnect);
       socket.off(MESSAGE_RECEIVED_EVENT, onMessageReceived);
       socket.off(TYPING_EVENT, handleOnSocketTyping);
       socket.off(STOP_TYPING_EVENT, handleOnSocketStopTyping);
       socket.off(MESSAGE_DELETE_EVENT, onMessageDelete);
-      socket.off(NEW_CHAT_EVENT, onNewChat);
-      socket.off(LEAVE_CHAT_EVENT, onChatLeave);
-      socket.off(UPDATE_GROUP_NAME_EVENT, onGroupNameChange);
     };
   }, [socket, chats]);
+
   const renderItem = ({item, index}: any) => {
     return (
       <ChatComponentColum
@@ -353,10 +284,9 @@ const ChatComponents = ({route, navigation}: any) => {
     );
   };
 
-  const keyExtractor = useCallback(
-    (item: {_id: {toString: () => any}}) => item._id.toString(),
-    [],
-  );
+  const keyExtractor = (item: {_id: {toString: () => any}}) =>
+    item._id.toString();
+
   return (
     <View style={{flex: 1, backgroundColor: '#ece5dd'}}>
       {selectedItem ? (

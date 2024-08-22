@@ -4,50 +4,60 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { useRemoveGroupChatParticipentMutation } from '../../API/endpoints/mainApi';
+import {
+  useGetGroupChatDetailsQuery,
+  useLeaveGroupCHatMutation,
+  useRemoveGroupChatParticipentMutation,
+} from '../../API/endpoints/mainApi';
 import CommunitiesSvg from '../../asset/SVG/CommunitiesSvg';
+import ExitSvg from '../../asset/SVG/ExitSvg';
 import LeftArrowSvg from '../../asset/SVG/LeftArrowSvg';
 import navigationString from '../../navigation/navigationString';
-import { groupChatDetails } from '../../redux/slices/groupChatDetailsSlice';
-import { RootState } from '../../redux/store';
 import {
   moderateScale,
   scale,
   textScale,
   verticalScale,
+  width,
 } from '../../styles/responsiveStyles';
-import { goBack, navigate } from '../../utills/HelperFuncation';
+import {goBack, navigate} from '../../utills/HelperFuncation';
 import GroupChatDetailsColum from '../columns/GroupChatDetailsColum';
 import Header from '../common/Header';
+import LoadingScreen from '../common/Loader';
 import TextComp from '../common/TextComp';
 import VirtualizedView from '../common/VirtualizedView';
 
-const GroupChatDetails = ({}) => {
-  4;
-  const dispatch = useDispatch();
-  const GroupChatDetails = useSelector(
-    (state: RootState) => state?.GroupChatDetails,
-  );
-  const [removePaaricipent] = useRemoveGroupChatParticipentMutation();
+const GroupChatDetails = ({route}: any) => {
+  const {params} = route;
+  const [removePaaricipent, {isLoading}] =
+    useRemoveGroupChatParticipentMutation();
+  const [leaveChat] = useLeaveGroupCHatMutation();
+  const {data: GroupChatDetails, refetch: refechGroupChatDetails} =
+    useGetGroupChatDetailsQuery({
+      roomId: params?.roomId,
+    });
   const onPressRemoveParticipent = async (item: string) => {
     try {
-      const res = await removePaaricipent({
+      await removePaaricipent({
         roomId: GroupChatDetails?.data?._id,
         participentId: item,
       });
-      dispatch(
-        groupChatDetails({
-          data: res.data?.data,
-          message: res.data?.message || '',
-        }),
-      );
+      refechGroupChatDetails();
     } catch (error) {
       console.log('remove participent faild:', error);
     }
   };
+  const onPressLeaveChat = async () => {
+    try {
+      await leaveChat({roomId: GroupChatDetails?.data?._id});
+      navigate(navigationString.MESSAGE_SCREEN);
+    } catch (error) {
+      console.log('leave chat faild:', error);
+    }
+  };
+
   return (
     <VirtualizedView>
       <Header
@@ -75,7 +85,7 @@ const GroupChatDetails = ({}) => {
               <Image
                 key={participant._id}
                 source={{
-                  uri: participant?.avatar?.url
+                  uri: participant?.avatar?.url,
                 }}
                 style={[
                   styles.avatar,
@@ -113,7 +123,8 @@ const GroupChatDetails = ({}) => {
           style={styles.newGroupBtnContainer}
           onPress={() =>
             navigate(navigationString.NewGroup_Screen, {
-              AvailableUserData: GroupChatDetails?.data?._id,
+              AvailableUserData: GroupChatDetails?.data,
+              roomId:params?.roomId
             })
           }>
           <View style={styles.newGroupBtn}>
@@ -124,21 +135,31 @@ const GroupChatDetails = ({}) => {
             style={styles.newGroupBtnTextStyle}
           />
         </TouchableOpacity>
-        <FlatList
-          data={GroupChatDetails?.data?.participants}
-          keyExtractor={item => item?._id.toString()}
-          renderItem={({item, index}) => {
-            return (
-              <GroupChatDetailsColum
-                item={item}
-                index={index}
-                key={GroupChatDetailsColum + item?._id}
-                onPressRemoveParticipent={onPressRemoveParticipent}
-              />
-            );
-          }}
-        />
+        {isLoading ? (
+          <LoadingScreen color="#000" />
+        ) : (
+          <FlatList
+            data={GroupChatDetails?.data?.participants}
+            keyExtractor={item => item?._id.toString()}
+            renderItem={({item, index}) => {
+              return (
+                <GroupChatDetailsColum
+                  item={item}
+                  index={index}
+                  key={GroupChatDetailsColum + item?._id}
+                  onPressRemoveParticipent={onPressRemoveParticipent}
+                />
+              );
+            }}
+          />
+        )}
       </View>
+      <TouchableOpacity
+        style={styles.exitGroupContainer}
+        onPress={onPressLeaveChat}>
+        <ExitSvg />
+        <TextComp text="Exit Group" style={styles.exitGroupText} />
+      </TouchableOpacity>
     </VirtualizedView>
   );
 };
@@ -153,14 +174,14 @@ const styles = StyleSheet.create({
   },
   avatarPosition0: {
     left: 0,
-    zIndex: 3,
+    zIndex: 0,
   },
   avatarPosition1: {
-    left: 20,
+    left: 0,
     zIndex: 2,
   },
   avatarPosition2: {
-    left: 40,
+    left: 10,
     zIndex: 1,
   },
   avatar: {
@@ -191,6 +212,18 @@ const styles = StyleSheet.create({
     opacity: 1,
     fontSize: textScale(16),
     fontWeight: '600',
+    marginLeft: moderateScale(12),
+  },
+  exitGroupContainer: {
+    marginVertical: moderateScale(20),
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: moderateScale(30),
+    width: scale(width / 2.5),
+  },
+  exitGroupText: {
+    fontSize: textScale(20),
+    color: 'red',
     marginLeft: moderateScale(12),
   },
 });

@@ -12,6 +12,7 @@ import {
   Get_Available_User,
   Get_User_Chat_List,
   Group_Chat_Details,
+  Leave_GroupChat,
   Remove_GroupChat_Participent,
   Send_Message,
 } from '../../config/url';
@@ -115,6 +116,15 @@ export const mainApi = baseApi.injectEndpoints({
         method: 'POST',
       }),
     }),
+    leaveGroupCHat: builder.mutation<
+    APISuccessResponseInterface,
+    {roomId: any}
+  >({
+    query: ({roomId}) => ({
+      url: `${Leave_GroupChat}/${roomId}`,
+      method: 'DELETE',
+    }),
+  }),
   }),
   overrideExisting: true,
 });
@@ -124,6 +134,7 @@ export const {
   useGetUsersChatListQuery,
   useCreateChatMutation,
   useGetAllMessageQuery,
+  useLazyGetAllMessageQuery,
   useSendMessageMutation,
   useDeleteMessageMutation,
   useDeleteGroupChatMutation,
@@ -132,4 +143,5 @@ export const {
   useGetGroupChatDetailsQuery,
   useRemoveGroupChatParticipentMutation,
   useAddGroupChatParticipentMutation,
+  useLeaveGroupCHatMutation
 } = mainApi;

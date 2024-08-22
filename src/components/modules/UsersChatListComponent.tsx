@@ -24,6 +24,8 @@ import Header from '../common/Header';
 import LoadingScreen from '../common/Loader';
 import TextComp from '../common/TextComp';
 import {ChatListItemInterface} from '../interfaces/chat';
+import CommonFlotingBotton from '../common/CommonFlotingBotton';
+import AddSvg from '../../asset/SVG/AddSvg';
 
 const UsersChatListComponent = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -31,9 +33,10 @@ const UsersChatListComponent = () => {
   const [firstSelectionDone, setFirstSelectionDone] = useState<boolean>(false);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [isToggalMenuBotton, setIsToggalMenuBotton] = useState<boolean>(false);
-  const loggedUser = useSelector((state: RootState) => state?.auth);
   const [chats, setChats] = useState<ChatListItemInterface[]>([]);
   const [checkDeleteChats, setCheckDeleteChats] = useState<boolean>(false);
+  const [isloading, setIsLoading] = useState<boolean>(false);
+  const loggedUser = useSelector((state: RootState) => state?.auth);
 
   const {
     data: userChatListData,
@@ -54,6 +57,7 @@ const UsersChatListComponent = () => {
   useEffect(() => {
     if (userChatListData) {
       setChats(userChatListData?.data || []);
+      setIsLoading(userChatListLoding);
     }
   }, [userChatListData]);
 
@@ -110,17 +114,24 @@ const UsersChatListComponent = () => {
   async function handleDeleteChat(chatId: string) {
     try {
       if (checkDeleteChats) {
+        setIsLoading(true);
         const data = await deleteGroupCHat({chatId}).unwrap();
+        refetchData();
+        setIsLoading(false);
         showSucess(data.message);
       } else {
+        setIsLoading(true);
         const data = await deleteChat({chatId}).unwrap();
+        refetchData();
+        setIsLoading(false);
         showSucess(data.message);
       }
-      await refetchData();
       setSelectedItemId(null);
     } catch (error) {
+      console.log(error);
       // showError(error?.data?.message)
       setSelectedItemId(null);
+      setIsLoading(false);
     }
   }
   return (
@@ -145,41 +156,39 @@ const UsersChatListComponent = () => {
           secondIcon={<QrCodeSvg />}
         />
       )}
-      <View style={{marginBottom: moderateScale(50)}}>
-        <FlatList
-          data={chats}
-          keyExtractor={(item, index) => String(item._id)}
-          renderItem={({item, index}) => {
-            return (
-              <>
-                {userChatListLoding ? (
-                  <LoadingScreen />
-                ) : (
-                  <UsersChatListComponentsColums
-                    item={item}
-                    index={index}
-                    key={'GetUserChatListColums' + index}
-                    refetchData={refetchData}
-                    isError={userChatListError}
-                    onPressProgram={onPressProgram}
-                    isSelected={item._id === selectedItemId}
-                    onLongPressStart={() =>
-                      handleLongPressStart(item._id, item.isGroupChat)
-                    }
-                    onLongPressEnd={handleLongPressEnd}
-                    unreadCount={
-                      UnreadeMessageCount?.filter(n => n.chat === item?._id)
-                        .length
-                    }
-                  />
-                )}
-              </>
-            );
-          }}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
+      <View style={{marginBottom: moderateScale(50), flex: 1}}>
+        {isloading ? (
+          <LoadingScreen />
+        ) : (
+          <FlatList
+            data={chats}
+            keyExtractor={(item, index) => String(item._id)}
+            renderItem={({item, index}) => {
+              return (
+                <UsersChatListComponentsColums
+                  item={item}
+                  index={index}
+                  key={'GetUserChatListColums' + index}
+                  refetchData={refetchData}
+                  isError={userChatListError}
+                  onPressProgram={onPressProgram}
+                  isSelected={item._id === selectedItemId}
+                  onLongPressStart={() =>
+                    handleLongPressStart(item._id, item.isGroupChat)
+                  }
+                  onLongPressEnd={handleLongPressEnd}
+                  unreadCount={
+                    UnreadeMessageCount?.filter(n => n.chat === item?._id)
+                      .length
+                  }
+                />
+              );
+            }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />
+        )}
       </View>
       {isToggalMenuBotton ? (
         <View style={styles.menuToggalBotton}>
@@ -193,6 +202,12 @@ const UsersChatListComponent = () => {
           />
         </View>
       ) : null}
+      <CommonFlotingBotton
+        onPress={() =>
+          navigate(navigationString.GetAvailableUser)
+        }
+        Icon={<AddSvg />}
+      />
     </View>
   );
 };

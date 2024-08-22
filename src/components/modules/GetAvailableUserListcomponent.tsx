@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import {
   useCreateChatMutation,
   useGetAvailableUserQuery,
+  useGetUsersChatListQuery,
 } from '../../API/endpoints/mainApi';
 import CommunitiesSvg from '../../asset/SVG/CommunitiesSvg';
 import navigationString from '../../navigation/navigationString';
@@ -15,8 +16,7 @@ import Header from '../common/Header';
 import TextComp from '../common/TextComp';
 import { UserInterface } from '../interfaces/user';
 
-
-const GetAvailableUserListcomponent = ({}) => {
+const GetAvailableUserListcomponent = () => {
   const dispatch = useDispatch();
   const {
     data: usersAvailable,
@@ -25,6 +25,7 @@ const GetAvailableUserListcomponent = ({}) => {
     refetch: refetchData,
   } = useGetAvailableUserQuery();
   const [createChat] = useCreateChatMutation();
+  const {refetch: refetchUserChatListData} = useGetUsersChatListQuery();
 
   async function onPressProgram(item: UserInterface) {
     try {
@@ -39,6 +40,7 @@ const GetAvailableUserListcomponent = ({}) => {
           success: success,
         }),
       );
+      refetchUserChatListData();
       navigate(navigationString.CHAT_SCREEN, {userId: data});
     } catch (error) {
       console.log(error);
@@ -50,6 +52,7 @@ const GetAvailableUserListcomponent = ({}) => {
         isRightHeaderContainer={true}
         isRightHeaderContainerImageWant={false}
         leftArrowNavigation={() => goBack()}
+        userNameText="Contacts"
       />
       <TouchableOpacity
         style={styles.newGroupBtnContainer}

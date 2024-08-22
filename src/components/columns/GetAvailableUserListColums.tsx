@@ -1,13 +1,13 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import {spacing} from '../../styles/spacing';
-import TextComp from '../common/TextComp';
-import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
-import LoadingScreen from '../../components/common/Loader';
-import {UserInterface} from '../interfaces/user';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CheckMark from '../../asset/SVG/CheckMarkSvg';
+import LoadingScreen from '../../components/common/Loader';
+import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
+import { spacing } from '../../styles/spacing';
+import TextComp from '../common/TextComp';
+import { UserInterface } from '../interfaces/user';
 
-type GetAvailableUserListColumsProps ={
+type GetAvailableUserListColumsProps = {
   item: UserInterface;
   index?: any;
   onPressProgram: (item: UserInterface) => void;
@@ -15,24 +15,26 @@ type GetAvailableUserListColumsProps ={
   refetchData?: () => void;
   isError?: boolean;
   isSelected?: boolean;
-}
+  isDisabled?: boolean;
+};
 
 const GetAvailableUserListColums = ({
   item,
   isLoading,
-  isError,
   onPressProgram,
   isSelected,
+  isDisabled,
 }: GetAvailableUserListColumsProps) => {
   return (
     <>
       {isLoading ? (
-        <LoadingScreen color="red" />
+        <LoadingScreen color="#000" />
       ) : (
         <TouchableOpacity
-          style={styles.container}
+          style={[styles.container, isDisabled && styles.disabledContainer]}
           activeOpacity={0.7}
-          onPress={() => onPressProgram(item)}>
+          onPress={() => onPressProgram(item)}
+          disabled={isDisabled}>
           <View
             style={{
               flexDirection: 'row',
@@ -78,5 +80,8 @@ const styles = StyleSheet.create({
     height: scale(50),
     resizeMode: 'cover',
     borderRadius: scale(50) / 2,
+  },
+  disabledContainer: {
+    opacity: 0.5,
   },
 });

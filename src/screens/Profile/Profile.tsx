@@ -1,23 +1,23 @@
 import axios from 'axios';
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { useUpdateUserAvatarMutation } from '../../API/endpoints/authApi';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {useUpdateUserAvatarMutation} from '../../API/endpoints/authApi';
 import BottonComp from '../../components/common/BottonComp';
 import Header from '../../components/common/Header';
 import TextComp from '../../components/common/TextComp';
-import { baseUrl, Update_Avatar } from '../../config/url';
-import { logout } from '../../redux/slices/authSlice';
-import { RootState } from '../../redux/store';
-import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
-import { pickDocument } from '../../utills/commonImagePicker';
+import {baseUrl, Update_Avatar} from '../../config/url';
+import {logout} from '../../redux/slices/authSlice';
+import {RootState} from '../../redux/store';
+import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
+import {pickDocument} from '../../utills/commonImagePicker';
 import {
   clearAsyncKeyData,
   getToken,
   TOKEN_KEY,
   USER_DATA,
 } from '../../utills/CustomAsyncStorage';
-import { goBack } from '../../utills/HelperFuncation';
+import {goBack} from '../../utills/HelperFuncation';
 
 const Profile = ({}) => {
   const dispatch = useDispatch();
@@ -32,12 +32,19 @@ const Profile = ({}) => {
       });
       try {
         let token = await getToken(TOKEN_KEY);
-        const res = await axios.patch(baseUrl + Update_Avatar, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log('res >', JSON.stringify(res));
+        await axios
+          .patch(baseUrl + Update_Avatar, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
       } catch (error) {
         console.error('Image upload failed:', error);
       }

@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import DeleteSvg from '../../asset/SVG/DeleteSvg';
 import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
 import TextComp from '../common/TextComp';
@@ -20,31 +15,33 @@ const GroupChatDetailsColum = ({
   onPressRemoveParticipent,
 }: GroupChatDetailsColumsProps) => {
   return (
-    <View
-      style={{
-        marginVertical: moderateScale(10),
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <Image
-          source={{
-            uri: item.avatar.url,
-          }}
-          style={styles.imageStyle}
-        />
-        <TextComp text={item?.username} style={styles.nameText} />
-        {item?.role === 'ADMIN' && (
-          <View style={styles.roleTextContainer}>
-            <TextComp text={item?.role} style={styles.roleText} />
-          </View>
-        )}
+    <>
+      <View
+        style={{
+          marginVertical: moderateScale(10),
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <Image
+            source={{
+              uri: item.avatar.url,
+            }}
+            style={styles.imageStyle}
+          />
+          <TextComp text={item?.username} style={styles.nameText} />
+          {item?.role === 'ADMIN' && (
+            <View style={styles.roleTextContainer}>
+              <TextComp text={item?.role} style={styles.roleText} />
+            </View>
+          )}
+        </View>
+        <TouchableOpacity onPress={() => onPressRemoveParticipent(item?._id)}>
+          <DeleteSvg stroke={'red'} />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={() => onPressRemoveParticipent(item?._id)}>
-        <DeleteSvg stroke={'red'} />
-      </TouchableOpacity>
-    </View>
+    </>
   );
 };
 

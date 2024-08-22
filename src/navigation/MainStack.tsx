@@ -1,7 +1,6 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
 import * as Screen from '../screens/index';
-import bottomTabs from './bottomTabs';
 import navigationString from './navigationString';
 
 const Stack = createNativeStackNavigator();
@@ -9,16 +8,10 @@ const Stack = createNativeStackNavigator();
 const MainStack = () => {
   return (
     <>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          presentation: 'modal',
-          animation: 'slide_from_right',
-          animationTypeForReplace: 'push',
-        }}>
+      <Stack.Navigator>
         <Stack.Screen
-          name={navigationString.BOTTON_TAB_BAR}
-          component={bottomTabs}
+          name={navigationString.MESSAGE_SCREEN}
+          component={Screen.messageScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen

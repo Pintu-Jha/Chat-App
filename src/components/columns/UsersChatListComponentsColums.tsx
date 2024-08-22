@@ -35,7 +35,7 @@ const UsersChatListComponentsColums = ({
   return (
     <TouchableOpacity
       style={[isSelected ? styles.selectedMessage : null, styles.container]}
-      activeOpacity={0.7}
+      activeOpacity={0.5}
       onPress={() => onPressProgram(item)}
       onLongPress={() => {
         if (onLongPressStart) onLongPressStart();

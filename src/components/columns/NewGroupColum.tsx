@@ -1,9 +1,12 @@
 import React, {useState} from 'react';
 import {FlatList, Image, StyleSheet, TextInput, View} from 'react-native';
-import {useCreateGroupChatMutation} from '../../API/endpoints/mainApi';
+import {
+  useCreateGroupChatMutation,
+  useGetUsersChatListQuery,
+} from '../../API/endpoints/mainApi';
 import YesSvg from '../../asset/SVG/YesSvg';
 import navigationString from '../../navigation/navigationString';
-import {moderateScale, scale} from '../../styles/responsiveStyles';
+import {moderateScale, scale, textScale} from '../../styles/responsiveStyles';
 import {goBack, navigate} from '../../utills/HelperFuncation';
 import CommonFlotingBotton from '../common/CommonFlotingBotton';
 import Header from '../common/Header';
@@ -13,22 +16,28 @@ import Header from '../common/Header';
 // };
 const NewGroupColum = ({route}: any) => {
   const [name, setGroupName] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {SelectedUser} = route.params;
   const [CreateGroupChat] = useCreateGroupChatMutation();
+  const {refetch: refetchData} = useGetUsersChatListQuery();
   const handalePress = async () => {
+    setIsLoading(true);
     try {
       if (name.trim() === '') return;
       const participantArray = SelectedUser.map(
         (user: {_id: string}) => user._id,
       );
       const CreateGroupData = {name, participants: participantArray};
-      await CreateGroupChat({
+       await CreateGroupChat({
         CreateGroupData: CreateGroupData,
       }).unwrap();
+      refetchData();
       navigate(navigationString.MESSAGE_SCREEN);
+      setIsLoading(false);
     } catch (error) {
       console.error('Failed to Create group chat:', error);
+      setIsLoading(false);
     }
   };
   const renderItem = ({item}: any) => {
@@ -61,6 +70,7 @@ const NewGroupColum = ({route}: any) => {
           onChangeText={e => setGroupName(e)}
           style={styles.TextInputStyle}
           placeholder="Enter Group Name"
+          placeholderTextColor={'gray'}
         />
         <FlatList
           data={SelectedUser}
@@ -69,7 +79,11 @@ const NewGroupColum = ({route}: any) => {
           horizontal
         />
       </View>
-      <CommonFlotingBotton Icon={<YesSvg />} onPress={handalePress} />
+      <CommonFlotingBotton
+        Icon={<YesSvg />}
+        onPress={handalePress}
+        isLoading={isLoading}
+      />
     </>
   );
 };
@@ -83,6 +97,8 @@ const styles = StyleSheet.create({
   },
   TextInputStyle: {
     borderBottomWidth: 1,
+    color: '#000',
+    fontSize: textScale(18),
   },
   imageStyle: {
     width: scale(50),

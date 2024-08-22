@@ -19,3 +19,4 @@ export const Create_Group_Chat = '/chat-app/chats/group';
 export const Group_Chat_Details = '/chat-app/chats/group';
 export const Remove_GroupChat_Participent = '/chat-app/chats/group';
 export const Add_GroupChat_Participent = '/chat-app/chats/group';
+export const Leave_GroupChat = '/chat-app/chats/leave/group'

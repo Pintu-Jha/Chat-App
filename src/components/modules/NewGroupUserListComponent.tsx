@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import {
   useAddGroupChatParticipentMutation,
   useGetAvailableUserQuery,
+  useGetGroupChatDetailsQuery
 } from '../../API/endpoints/mainApi';
 import RightArrow from '../../asset/SVG/RightArrow';
 import navigationString from '../../navigation/navigationString';
@@ -15,13 +16,25 @@ import VirtualizedView from '../common/VirtualizedView';
 import { UserInterface } from '../interfaces/user';
 import NewGroupRow from '../rows/NewGroupRow';
 
-const NewGroupUserListComponent= ({}) => {
- 
+const NewGroupUserListComponent = ({route}: any) => {
+  const {params} = route;
+
   const [selectedNewGroupUser, setSelectedNewGroupUser] = useState<
     UserInterface[]
   >([]);
   const {data: usersAvailable} = useGetAvailableUserQuery();
-  const [addGroupChatParticipent, {}] = useAddGroupChatParticipentMutation();
+  const [addGroupChatParticipent] = useAddGroupChatParticipentMutation();
+  const {refetch: refetchGroupChatDetails} = useGetGroupChatDetailsQuery({
+    roomId: params?.roomId,
+  });
+  const notInSecondArray = usersAvailable?.data.filter(
+    (item1: {_id: any}) =>
+      !params?.AvailableUserData?.participants.some(
+        (item2: {_id: any}) => item1._id === item2._id,
+      ),
+  );
+  const ids = notInSecondArray.map((item: {_id: any}) => item._id);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onPressProgram = (item: UserInterface) => {
     setSelectedNewGroupUser(prevSelectedUsers => {
@@ -34,12 +47,20 @@ const NewGroupUserListComponent= ({}) => {
       return [...prevSelectedUsers, item];
     });
   };
-  const handlePress = () => {
-    if (selectedNewGroupUser.length > 0) {
+  const handlePress = async () => {
+    if (params?.AvailableUserData?._id) {
+      setIsLoading(true);
+      await addGroupChatParticipent({
+        roomId: params?.AvailableUserData?._id,
+        participentId: selectedNewGroupUser[0]?._id,
+      });
+      refetchGroupChatDetails();
+      setIsLoading(false);
+      goBack();
+    } else if (selectedNewGroupUser.length > 0) {
       navigate(navigationString.NewGroupColum_Screen, {
         SelectedUser: selectedNewGroupUser,
       });
-    } else if (false) {
     } else {
       showError('Atleast one selecte');
     }
@@ -79,6 +100,7 @@ const NewGroupUserListComponent= ({}) => {
             const isSelected = selectedNewGroupUser.find(
               user => user?._id === item?._id,
             );
+            const isDisabled = !ids.includes(item._id) ? true : false;
             return (
               <GetAvailableUserListColums
                 item={item}
@@ -86,12 +108,17 @@ const NewGroupUserListComponent= ({}) => {
                 key={'GetAvailableUserListColums' + item._id}
                 onPressProgram={onPressProgram}
                 isSelected={!!isSelected}
+                isDisabled={isDisabled}
               />
             );
           }}
         />
       </VirtualizedView>
-      <CommonFlotingBotton Icon={<RightArrow />} onPress={handlePress} />
+      <CommonFlotingBotton
+        Icon={<RightArrow />}
+        onPress={handlePress}
+        isLoading={isLoading}
+      />
     </>
   );
 };

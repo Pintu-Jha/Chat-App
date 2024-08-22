@@ -51,7 +51,6 @@ export const getColorForParticipant = (participantId: string) => {
 
 //NAVIGATION FUNCTIONS
 export const navigate = (routeName: string, params?: Record<string, any>) => {
-  //code to tarck
   NavigationService.navigate(routeName, params);
 };
 
