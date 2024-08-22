@@ -1,14 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { FC } from 'react'
+import {StyleSheet, Text, View} from 'react-native';
+import React, {FC} from 'react';
 
-const Calls:FC = () => {
+const Calls = () => {
   return (
     <View>
-      <Text style={{color:'#000',fontSize:30}}>Calls</Text>
+      <Text style={{color: '#000', fontSize: 30}}>Calls</Text>
     </View>
-  )
-}
+  );
+};
 
-export default Calls
+export default Calls;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

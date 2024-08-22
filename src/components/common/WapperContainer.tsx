@@ -12,7 +12,7 @@ type WapperContainerProps = {
   children: ReactNode;
 };
 
-const WapperContainer: React.FC<WapperContainerProps> = ({style, children}) => {
+const WapperContainer = ({style, children}: WapperContainerProps) => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <StatusBar backgroundColor={'gray'} />

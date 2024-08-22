@@ -4,15 +4,16 @@ import {USER_DATA, retrieveItem} from '../utills/CustomAsyncStorage';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: baseUrl,
-  prepareHeaders: async headers => {
+  prepareHeaders: async (headers, {endpoint}) => {
     try {
-      let token = await retrieveItem(USER_DATA);
+      const token = await retrieveItem(USER_DATA);
       if (token.accessToken) {
         headers.set('Authorization', `Bearer ${token}`);
       }
-      headers.set('Content-Type', 'application/json');
+      // headers.set('Content-Type', 'application/json');
       headers.set('Accept', 'application/json');
-      headers.set('Access-Control-Allow-Origin', '*');
+      // headers.set('Access-Control-Allow-Origin', '*');
+      // headers.set('Content-Type', 'multipart/form-data');
       return headers;
     } catch (error) {
       console.log('token not found');

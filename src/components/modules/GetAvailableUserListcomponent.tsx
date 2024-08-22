@@ -1,44 +1,69 @@
-import {View, Text, FlatList} from 'react-native';
-import React, {FC} from 'react';
-import GetAvailableUserListColums from '../columns/GetAvailableUserListColums';
+import React from 'react';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useDispatch } from 'react-redux';
 import {
   useCreateChatMutation,
   useGetAvailableUserQuery,
+  useGetUsersChatListQuery,
 } from '../../API/endpoints/mainApi';
+import CommunitiesSvg from '../../asset/SVG/CommunitiesSvg';
 import navigationString from '../../navigation/navigationString';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {MainRootStackParams} from '../../navigation/MainStack';
-import LoadingScreen from '../common/Loader';
+import { createChatData } from '../../redux/slices/createChatSlice';
+import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
+import { goBack, navigate } from '../../utills/HelperFuncation';
+import GetAvailableUserListColums from '../columns/GetAvailableUserListColums';
+import Header from '../common/Header';
+import TextComp from '../common/TextComp';
+import { UserInterface } from '../interfaces/user';
 
-type Props = NativeStackScreenProps<
-  MainRootStackParams,
-  typeof navigationString.GetAvailableUser
->;
-const GetAvailableUserListcomponent: FC<Props> = ({navigation}) => {
+const GetAvailableUserListcomponent = () => {
+  const dispatch = useDispatch();
   const {
     data: usersAvailable,
     isLoading,
     isError,
     refetch: refetchData,
   } = useGetAvailableUserQuery();
+  const [createChat] = useCreateChatMutation();
+  const {refetch: refetchUserChatListData} = useGetUsersChatListQuery();
 
-  const [createChat, {isLoading: isCreating, error, isSuccess}] =
-    useCreateChatMutation();
-
-  function onPressProgram(item: Record<string, any>) {
-    createChat({userId: item._id})
-      .unwrap()
-      .then(() => {
-        navigation.navigate(navigationString.CHAT_SCREEN, {id: item._id});
-      })
-      .catch(err => {
-        console.error('Failed to create chat:', err);
-      });
+  async function onPressProgram(item: UserInterface) {
+    try {
+      const {data, statusCode, message, success} = await createChat({
+        receiverId: item._id,
+      }).unwrap();
+      dispatch(
+        createChatData({
+          statusCode: statusCode,
+          data: data,
+          message: message,
+          success: success,
+        }),
+      );
+      refetchUserChatListData();
+      navigate(navigationString.CHAT_SCREEN, {userId: data});
+    } catch (error) {
+      console.log(error);
+    }
   }
-  console.log(usersAvailable?.data);
-  
   return (
     <View>
+      <Header
+        isRightHeaderContainer={true}
+        isRightHeaderContainerImageWant={false}
+        leftArrowNavigation={() => goBack()}
+        userNameText="Contacts"
+      />
+      <TouchableOpacity
+        style={styles.newGroupBtnContainer}
+        onPress={() =>
+          navigate(navigationString.NewGroup_Screen)
+        }>
+        <View style={styles.newGroupBtn}>
+          <CommunitiesSvg />
+        </View>
+        <TextComp text="New Group" style={styles.newGroupBtnTextStyle} />
+      </TouchableOpacity>
       <FlatList
         data={usersAvailable?.data}
         keyExtractor={(item, index) => item._id.toString()}
@@ -57,5 +82,29 @@ const GetAvailableUserListcomponent: FC<Props> = ({navigation}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  newGroupBtn: {
+    width: scale(50),
+    height: scale(50),
+    backgroundColor: 'green',
+    borderRadius: scale(50) / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  newGroupBtnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: moderateScale(16),
+    marginHorizontal: moderateScale(20),
+  },
+  newGroupBtnTextStyle: {
+    color: '#0F0C1A',
+    opacity: 1,
+    fontSize: textScale(16),
+    fontWeight: '600',
+    marginLeft: moderateScale(12),
+  },
+});
 
 export default GetAvailableUserListcomponent;

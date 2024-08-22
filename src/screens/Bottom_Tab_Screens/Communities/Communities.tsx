@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { FC } from 'react'
 
-const Communities:FC = () => {
+const Communities = () => {
   return (
     <View>
       <Text>Communities</Text>

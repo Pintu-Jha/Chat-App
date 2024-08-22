@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -8,10 +9,9 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React from 'react';
-import {spacing} from '../../styles/spacing';
-import {textScale} from '../../styles/responsiveStyles';
-import {fontNames} from '../../styles/typography';
+import { textScale } from '../../styles/responsiveStyles';
+import { spacing } from '../../styles/spacing';
+import { fontNames } from '../../styles/typography';
 
 type TextInputContainerProps = {
   onPress?: () => void;
@@ -27,7 +27,7 @@ type TextInputContainerProps = {
   ActivityIndicatorColor?:string
 };
 
-const BottonComp: React.FC<TextInputContainerProps> = ({
+const BottonComp= ({
   onPress,
   text = '',
   style = {},
@@ -39,7 +39,7 @@ const BottonComp: React.FC<TextInputContainerProps> = ({
   isLoading = false,
   leftSvg = null,
   ActivityIndicatorColor='white'
-}) => {
+} : TextInputContainerProps) => {
   return (
     <TouchableOpacity
       style={{...styles.container, ...style}}

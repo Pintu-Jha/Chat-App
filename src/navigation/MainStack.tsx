@@ -1,29 +1,17 @@
-import React from 'react';
-import navigationString from './navigationString';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React from 'react';
 import * as Screen from '../screens/index';
-import bottomTabs from './bottomTabs';
+import navigationString from './navigationString';
 
-export type MainRootStackParams = {
-  [navigationString.BOTTON_TAB_BAR]: undefined;
-  [navigationString.GetAvailableUser]: undefined;
-  [navigationString.CHAT_SCREEN]: {id: string};
-};
-const Stack = createNativeStackNavigator<MainRootStackParams>();
+const Stack = createNativeStackNavigator();
 
-const MainStack: React.FC = () => {
+const MainStack = () => {
   return (
     <>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          presentation: 'modal',
-          animation: 'slide_from_right',
-          animationTypeForReplace: 'push',
-        }}>
+      <Stack.Navigator>
         <Stack.Screen
-          name={navigationString.BOTTON_TAB_BAR}
-          component={bottomTabs}
+          name={navigationString.MESSAGE_SCREEN}
+          component={Screen.messageScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
@@ -34,6 +22,26 @@ const MainStack: React.FC = () => {
         <Stack.Screen
           name={navigationString.CHAT_SCREEN}
           component={Screen.ChatComponents}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.Profile_Screen}
+          component={Screen.ProfileScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.NewGroup_Screen}
+          component={Screen.NewGroup}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.NewGroupColum_Screen}
+          component={Screen.NewGroupColum}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={navigationString.GroupChatDetailsScreen}
+          component={Screen.GroupChatDetails}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

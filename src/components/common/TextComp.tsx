@@ -9,13 +9,13 @@ type TextContainerProps = {
   onPress?: () => void;
 };
 
-const TextComp: React.FC<TextContainerProps> = ({
+const TextComp = ({
   text = '',
   style,
   children,
   onPress,
   ...props
-}) => {
+}:TextContainerProps) => {
   return (
     <Text
       style={{

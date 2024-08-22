@@ -1,4 +1,10 @@
 import {
+  GoogleSignin,
+  isErrorWithCode,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import React, { useState } from 'react';
+import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -7,38 +13,26 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import WapperContainer from '../../components/common/WapperContainer';
-import {spacing} from '../../styles/spacing';
+import { useDispatch } from 'react-redux';
+import { useSignupMutation } from '../../API/endpoints/authApi';
+import EmailSvg from '../../asset/SVG/EmailSvg';
+import EyeSvg from '../../asset/SVG/EyeSvg';
+import GoogleSvg from '../../asset/SVG/GoogleSvg';
+import HideEyeSvg from '../../asset/SVG/HideEyeSvg';
+import PasswordSvg from '../../asset/SVG/PasswordSvg';
+import UserSvg from '../../asset/SVG/UserSvg';
+import BottonComp from '../../components/common/BottonComp';
 import TextComp from '../../components/common/TextComp';
 import TextInputComp from '../../components/common/TextInputComp';
-import BottonComp from '../../components/common/BottonComp';
-import {textScale} from '../../styles/responsiveStyles';
+import WapperContainer from '../../components/common/WapperContainer';
 import navigationString from '../../navigation/navigationString';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthStackParams} from '../../navigation/AuthStack';
-import HideEyeSvg from '../../asset/SVG/HideEyeSvg';
-import EyeSvg from '../../asset/SVG/EyeSvg';
-import UserSvg from '../../asset/SVG/UserSvg';
-import EmailSvg from '../../asset/SVG/EmailSvg';
-import PasswordSvg from '../../asset/SVG/PasswordSvg';
-import GoogleSvg from '../../asset/SVG/GoogleSvg';
-import GitHubSvg from '../../asset/SVG/GitHubSvg';
-import {useDispatch} from 'react-redux';
-import {useSignupMutation} from '../../API/endpoints/authApi';
+import { setUser } from '../../redux/slices/authSlice';
+import { textScale } from '../../styles/responsiveStyles';
+import { spacing } from '../../styles/spacing';
+import { navigate, showError } from '../../utills/HelperFuncation';
 import validator from '../../utills/validations';
-import {showError} from '../../utills/HelperFuncation';
-import {setUser} from '../../redux/slices/authSlice';
-import {
-  GoogleSignin,
-  isErrorWithCode,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
 
-type Props = NativeStackScreenProps<AuthStackParams, 'signupScreen'>;
-
-const Signup: React.FC<Props> = ({navigation}) => {
+const Signup = ({}) => {
   const [username, setUserName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -186,7 +180,7 @@ const Signup: React.FC<Props> = ({navigation}) => {
                 <Text
                   style={{color: '#1c20c8'}}
                   onPress={() =>
-                    navigation.navigate(navigationString.LOGIN_SCREEN)
+                    navigate(navigationString.LOGIN_SCREEN)
                   }>
                   Login
                 </Text>

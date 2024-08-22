@@ -1,4 +1,10 @@
 import {
+  GoogleSignin,
+  isErrorWithCode,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import React, { useState } from 'react';
+import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -7,47 +13,44 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {FC, useState} from 'react';
-import {spacing} from '../../styles/spacing';
-import WapperContainer from '../../components/common/WapperContainer';
-import TextComp from '../../components/common/TextComp';
-import {textScale} from '../../styles/responsiveStyles';
-import TextInputComp from '../../components/common/TextInputComp';
-import BottonComp from '../../components/common/BottonComp';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AuthStackParams} from '../../navigation/AuthStack';
-import GoogleSvg from '../../asset/SVG/GoogleSvg';
+import { useDispatch } from 'react-redux';
+import { useLoginMutation } from '../../API/endpoints/authApi';
 import EyeSvg from '../../asset/SVG/EyeSvg';
+import GoogleSvg from '../../asset/SVG/GoogleSvg';
 import HideEyeSvg from '../../asset/SVG/HideEyeSvg';
 import PasswordSvg from '../../asset/SVG/PasswordSvg';
-import {useLoginMutation} from '../../API/endpoints/authApi';
-import {useDispatch, useSelector} from 'react-redux';
-import {setUser} from '../../redux/slices/authSlice';
 import UserSvg from '../../asset/SVG/UserSvg';
-import {showError, showSucess} from '../../utills/HelperFuncation';
-import validator from '../../utills/validations';
+import BottonComp from '../../components/common/BottonComp';
+import TextComp from '../../components/common/TextComp';
+import TextInputComp from '../../components/common/TextInputComp';
+import WapperContainer from '../../components/common/WapperContainer';
 import navigationString from '../../navigation/navigationString';
+import { setUser } from '../../redux/slices/authSlice';
+import { textScale } from '../../styles/responsiveStyles';
+import { spacing } from '../../styles/spacing';
 import {
-  GoogleSignin,
-  isErrorWithCode,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
+  storeItem,
+  storeToken,
+  USER_DATA,
+} from '../../utills/CustomAsyncStorage';
+import { navigate, showError, showSucess } from '../../utills/HelperFuncation';
+import validator from '../../utills/validations';
 
-
-type Props = NativeStackScreenProps<AuthStackParams, 'loginScreen'>;
-
-const Login: FC<Props> = ({navigation}) => {
+const Login = () => {
   const [username, setuserName] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [secureText, setSecureText] = useState<boolean>(true);
   const [isGoogleLoading, setIsGoogleLoding] = useState<boolean>(false);
-  const [login, {isLoading, isError,error,data,}] = useLoginMutation();
+  const [login, {isLoading, isError, error, data}] = useLoginMutation();
   const dispatch = useDispatch();
 
   const isValidData = () => {
     const error = validator({
       username,
       password,
+      fullName: undefined,
+      email: undefined,
+      otp: undefined
     });
     if (error) {
       showError(error);
@@ -60,7 +63,11 @@ const Login: FC<Props> = ({navigation}) => {
     if (validations) {
       try {
         const response = await login({password, username}).unwrap();
-        showSucess(response.message)
+        console.log(response.message);
+
+        await storeItem(USER_DATA, response.data);
+        await storeToken(response.data.accessToken);
+        showSucess(response.message);
         dispatch(
           setUser({
             user: response.data.user,
@@ -70,10 +77,13 @@ const Login: FC<Props> = ({navigation}) => {
           }),
         );
       } catch (err) {
-        const errorMessage = (err as { data?: { message?: string } })?.data?.message;
-        console.log('error>>', errorMessage);
-        showError(errorMessage);
-      } 
+        // const errorMessage = (err as {data?: {message?: string}})?.data
+        //   ?.message;
+        // console.log('error>>', errorMessage);
+        console.log('err', err);
+
+        // showError(errorMessage);
+      }
     }
   };
 
@@ -86,7 +96,7 @@ const Login: FC<Props> = ({navigation}) => {
         email: userInfo.user.email,
         name: userInfo.user.name,
         photo: userInfo.user.photo,
-      };      
+      };
       dispatch(
         setUser({
           user: data,
@@ -143,7 +153,6 @@ const Login: FC<Props> = ({navigation}) => {
                 secureTextEntry={secureText}
                 secureText={secureText ? <HideEyeSvg /> : <EyeSvg />}
                 onPressSecure={() => setSecureText(!secureText)}
-                keyboardType="visible-password"
                 isTitleIcon={true}
                 titleIcon={<PasswordSvg />}
               />
@@ -184,9 +193,7 @@ const Login: FC<Props> = ({navigation}) => {
                 }}>
                 <Text
                   style={{color: '#1c20c8'}}
-                  onPress={() =>
-                    navigation.navigate(navigationString.SIGNUP_SCREEN)
-                  }>
+                  onPress={() => navigate(navigationString.SIGNUP_SCREEN)}>
                   Sign up
                 </Text>
               </TextComp>

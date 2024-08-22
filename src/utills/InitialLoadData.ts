@@ -1,10 +1,10 @@
-import { participant} from "../API/endpoints/mainApi";
-
-// export const getSender = (loggedUser: participant, users: participant[]): string => {
-//     return users[0]._id === loggedUser._id ? users[1].name : users[0].name;
-//   };
-  
-  export const getSenderInfo = (loggedUser: participant, users: participant[]): participant => {
-    return users[0]._id === loggedUser._id ? users[1] : users[0];
-  };
-  
+import { ChatListItemInterface } from '../components/interfaces/chat';
+import {AuthState} from '../redux/slices/authSlice';
+export const getSenderInfo = (
+  loggedUser: AuthState,
+  users: ChatListItemInterface,
+) => {
+  return users.participants[0]._id === loggedUser?.user?._id
+    ? users.participants[1]
+    : users.participants[0];
+};

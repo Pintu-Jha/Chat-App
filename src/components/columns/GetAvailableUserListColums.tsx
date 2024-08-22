@@ -1,49 +1,56 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import React from 'react';
-import {spacing} from '../../styles/spacing';
-import TextComp from '../common/TextComp';
-import {scale, textScale} from '../../styles/responsiveStyles';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import CheckMark from '../../asset/SVG/CheckMarkSvg';
 import LoadingScreen from '../../components/common/Loader';
+import { moderateScale, scale, textScale } from '../../styles/responsiveStyles';
+import { spacing } from '../../styles/spacing';
+import TextComp from '../common/TextComp';
+import { UserInterface } from '../interfaces/user';
 
-interface GetAvailableUserListColumsProps {
-  item: Record<string, any>;
+type GetAvailableUserListColumsProps = {
+  item: UserInterface;
   index?: any;
-  onPressProgram: (item: Record<string, any>) => void;
+  onPressProgram: (item: UserInterface) => void;
   isLoading?: boolean;
   refetchData?: () => void;
   isError?: boolean;
-}
+  isSelected?: boolean;
+  isDisabled?: boolean;
+};
 
 const GetAvailableUserListColums = ({
   item,
   isLoading,
-  isError,
   onPressProgram,
-}: // navigation
-GetAvailableUserListColumsProps) => {
-
+  isSelected,
+  isDisabled,
+}: GetAvailableUserListColumsProps) => {
   return (
     <>
       {isLoading ? (
-        <LoadingScreen color="red" />
+        <LoadingScreen color="#000" />
       ) : (
         <TouchableOpacity
-          style={styles.container}
+          style={[styles.container, isDisabled && styles.disabledContainer]}
           activeOpacity={0.7}
-          onPress={() => onPressProgram(item)}>
+          onPress={() => onPressProgram(item)}
+          disabled={isDisabled}>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               flex: 1,
-              paddingVertical: spacing.PADDING_8,
             }}>
             <Image source={{uri: item.avatar.url}} style={styles.imageStyle} />
-            <View style={{marginLeft: spacing.MARGIN_8}}>
+            <View style={{}}>
               <TextComp text={item.username} style={styles.nameText} />
             </View>
           </View>
-          <Text>{}</Text>
+          {isSelected && (
+            <Text style={{position: 'absolute', bottom: 0, left: scale(35)}}>
+              <CheckMark />
+            </Text>
+          )}
         </TouchableOpacity>
       )}
     </>
@@ -54,7 +61,7 @@ export default GetAvailableUserListColums;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: spacing.MARGIN_16,
+    marginVertical: spacing.MARGIN_16,
     marginHorizontal: spacing.MARGIN_20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -65,12 +72,16 @@ const styles = StyleSheet.create({
     opacity: 1,
     fontSize: textScale(16),
     fontWeight: '600',
+    textTransform: 'capitalize',
+    marginLeft: moderateScale(12),
   },
   imageStyle: {
     width: scale(50),
     height: scale(50),
-    resizeMode: 'contain',
-    borderRadius: scale(50)/2,
-    backgroundColor:"#000"
+    resizeMode: 'cover',
+    borderRadius: scale(50) / 2,
+  },
+  disabledContainer: {
+    opacity: 0.5,
   },
 });
